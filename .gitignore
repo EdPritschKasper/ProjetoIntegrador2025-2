@@ -33,3 +33,4 @@ build/
 .vscode/
 
 src/java/com.Restaurante.Dove/resources/
+src/main/resources/application.properties

@@ -2,10 +2,8 @@ package com.Restaurante.Dove.service;
 
 import com.Restaurante.Dove.repository.ClienteRepository;
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import com.Restaurante.Dove.model.Cliente;
+import com.Restaurante.Dove.model.ClienteEntity;
 
 
 import java.util.List;
@@ -19,22 +17,22 @@ public class ClienteService {
         this.clienteRepository = clienteRepository;
     }
 
-    public Cliente save(Cliente cliente) {
+    public ClienteEntity save(ClienteEntity cliente) {
         if (cliente.getSenha() != null) {
             return clienteRepository.save(cliente);
         }
             throw new RuntimeException("Senha deve ser preenchida");
     }
 
-    public List<Cliente> findAll() {return clienteRepository.findAll();
+    public List<ClienteEntity> findAll() {return clienteRepository.findAll();
     }
 
-    public Cliente findById(Long id) {
+    public ClienteEntity findById(Long id) {
         return clienteRepository.findById(id).orElseThrow(() -> new EntityNotFoundException());
     }
 
-    public Cliente update(Long id , Cliente cliente) {
-        Cliente update = findById(id);
+    public ClienteEntity update(Long id , ClienteEntity cliente) {
+        ClienteEntity update = findById(id);
 
         if (cliente.getNome() != null && !cliente.getNome().isBlank()) {
             update.setNome(cliente.getNome());
@@ -48,7 +46,7 @@ public class ClienteService {
     }
 
     public void delete (Long id){
-        Cliente delete = findById(id);
+        ClienteEntity delete = findById(id);
         clienteRepository.delete(delete);
     }
 
