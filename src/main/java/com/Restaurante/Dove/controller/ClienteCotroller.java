@@ -17,7 +17,7 @@ public class ClienteCotroller {
     private final ClienteService clienteService;
 
     @GetMapping("/findAll")
-    public ResponseEntity<List<Cliente>> findAll(){
+    public ResponseEntity<List<ClienteEntity>> findAll(){
 
         try{
              var result = clienteService.findAll();
@@ -29,7 +29,7 @@ public class ClienteCotroller {
     }
 
     @PostMapping("/findById/{id}")
-    public ResponseEntity<Cliente> findById(@PathVariable long id){
+    public ResponseEntity<ClienteEntity> findById(@PathVariable long id){
         try {
             var result = clienteService.findById(id);
             return new ResponseEntity<>(result, HttpStatus.OK);
@@ -40,7 +40,7 @@ public class ClienteCotroller {
     }
 
     @PostMapping("/save")
-    public ResponseEntity<Cliente> save(@RequestBody Cliente cliente){
+    public ResponseEntity<ClienteEntity> save(@RequestBody ClienteEntity cliente){
 
         try {
             var result = clienteService.save(cliente);
@@ -51,7 +51,7 @@ public class ClienteCotroller {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<Cliente> update(@PathVariable Long id , @RequestBody Cliente cliente){
+    public ResponseEntity<ClienteEntity> update(@PathVariable Long id , @RequestBody ClienteEntity cliente){
 
         try {
             var result = clienteService.update(id, cliente);
