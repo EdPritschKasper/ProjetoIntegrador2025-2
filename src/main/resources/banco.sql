@@ -32,11 +32,11 @@ CREATE TABLE tb_ingrediente (
 
 CREATE TABLE tb_pedido (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    marmita VARCHAR(10),
+    marmita VARCHAR(20),
     status VARCHAR(10),
     hora_inicio TIME NOT NULL,
     hora_fim TIME,
-    cardapio_id BIGINT NOT NULL,
+    cardapio_id BIGINT,
     funcionario_id BIGINT,
     cliente_id BIGINT,
     CONSTRAINT fk_pedido_cardapio FOREIGN KEY (cardapio_id) REFERENCES tb_cardapio (id),
@@ -72,6 +72,7 @@ INSERT INTO tb_cardapio (data) VALUES
 ('2025-03-30'),
 ('2025-03-31'),
 ('2025-04-01');
+
 insert into tb_ingrediente (descricao) values
 ('arroz'),
 ('feijão'),
