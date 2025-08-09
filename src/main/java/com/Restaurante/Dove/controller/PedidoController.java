@@ -50,7 +50,7 @@ public class PedidoController {
     @GetMapping("/{id}")
     public ResponseEntity<PedidoEntity> findById(@PathVariable Integer id){
         try {
-            var result = pedidoService.findById(id);
+            var result = pedidoService.findById(Long.valueOf(id));
             return new ResponseEntity<>(result, HttpStatus.OK);
         } catch (Exception ex){
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
@@ -70,7 +70,7 @@ public class PedidoController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id){
         try {
-            pedidoService.delete(id);
+            pedidoService.delete(Long.valueOf(id));
             return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
         } catch (Exception ex){
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);

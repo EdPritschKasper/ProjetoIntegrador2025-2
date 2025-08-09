@@ -72,8 +72,9 @@ public class PedidoService {
         return pedidoRepository.findAll();
     }
 
-    public PedidoEntity findById(Integer id){
-        return pedidoRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+    public PedidoEntity findById(Long id) {
+        return pedidoRepository.findById(Math.toIntExact(id))
+                .orElseThrow(() -> new RuntimeException("Pedido não encontrado com id: " + id));
     }
 
     public PedidoEntity update(Long id, PedidoEntity pedidoAtualizado) {
@@ -121,8 +122,10 @@ public class PedidoService {
         }).orElseThrow(() -> new RuntimeException("Pedido não encontrado com id: " + id));
     }
 
-    public void delete(Integer id){
-        PedidoEntity delete = findById(id);
-        pedidoRepository.delete(delete);
+    public void delete(Long id) {
+        if (!pedidoRepository.existsById(Math.toIntExact(id))) {
+            throw new RuntimeException("Pedido não encontrado com id: " + id);
+        }
+        pedidoRepository.deleteById(Math.toIntExact(id));
     }
 }
