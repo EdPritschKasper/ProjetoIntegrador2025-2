@@ -3,7 +3,7 @@ package com.Restaurante.Dove.service;
 import com.Restaurante.Dove.model.IngredienteEntity;
 import com.Restaurante.Dove.model.PedidoEntity;
 import com.Restaurante.Dove.repository.*;
-import jakarta.persistence.EntityNotFoundException;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,25 +12,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Data
 @RequiredArgsConstructor
 public class PedidoService {
 
-//    private final PedidoRepository pedidoRepository;
-
-    @Autowired
-    private PedidoRepository pedidoRepository;
-
-    @Autowired
-    private CardapioRepository cardapioRepository;
-
-    @Autowired
-    private FuncionarioRepository funcionarioRepository;
-
-    @Autowired
-    private ClienteRepository clienteRepository;
-
-    @Autowired
-    private IngredienteRepository ingredienteRepository;
+    private final PedidoRepository pedidoRepository;
+    private final CardapioRepository cardapioRepository;
+    private final FuncionarioRepository funcionarioRepository;
+    private final ClienteRepository clienteRepository;
+    private final IngredienteRepository ingredienteRepository;
 
     public PedidoEntity save(PedidoEntity pedido) {
         // Buscar o cardápio pelo ID

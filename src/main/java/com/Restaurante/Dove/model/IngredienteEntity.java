@@ -22,8 +22,6 @@ public class IngredienteEntity {
     private String descricao;
     @ManyToMany(mappedBy = "ingredientes")
     private List<PedidoEntity> pedidos;
-//    private List<PedidoEntity> pedidos = new ArrayList<>();
     @ManyToMany(mappedBy = "ingredientes")
     private List<CardapioEntity> cardapios;
-//    private List<CardapiosEntity> cardapios = new ArrayList<>();
 }

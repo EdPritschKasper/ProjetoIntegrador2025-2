@@ -1,7 +1,8 @@
 package com.Restaurante.Dove.controller;
 
+import com.Restaurante.Dove.model.CardapioEntity;
 import com.Restaurante.Dove.model.PedidoEntity;
-import com.Restaurante.Dove.service.PedidoService;
+import com.Restaurante.Dove.service.CardapioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,16 +11,26 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/pedidos")
+@RequestMapping("/api/cardapios")
 @RequiredArgsConstructor
-public class PedidoController {
+public class CardapioController {
 
-    private final PedidoService pedidoService;
+    private final CardapioService cardapioService;
+
+    @GetMapping
+    public ResponseEntity<List<CardapioEntity>> findAll(){
+        try {
+            var result = cardapioService.findAll();
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        } catch (Exception ex){
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+    }
 
     @PostMapping
-    public ResponseEntity<PedidoEntity> save(@RequestBody PedidoEntity pedido){
+    public ResponseEntity<CardapioEntity> save(@RequestBody CardapioEntity cardapio){
         try {
-            var result = pedidoService.save(pedido);
+            var result = cardapioService.save(cardapio);
             return new ResponseEntity<>(result, HttpStatus.CREATED);
         } catch (Exception ex){
             ex.printStackTrace(); // ou use um logger
@@ -27,20 +38,10 @@ public class PedidoController {
         }
     }
 
-    @GetMapping
-    public ResponseEntity<List<PedidoEntity>> findAll(){
-        try {
-            var result = pedidoService.findAll();
-            return new ResponseEntity<>(result, HttpStatus.OK);
-        } catch (Exception ex){
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
-    }
-
     @GetMapping("/{id}")
-    public ResponseEntity<PedidoEntity> findById(@PathVariable Integer id){
+    public ResponseEntity<CardapioEntity> findById(@PathVariable Integer id){
         try {
-            var result = pedidoService.findById(Long.valueOf(id));
+            var result = cardapioService.findById(Long.valueOf(id));
             return new ResponseEntity<>(result, HttpStatus.OK);
         } catch (Exception ex){
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
@@ -48,9 +49,9 @@ public class PedidoController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<PedidoEntity> update(@PathVariable Integer id, @RequestBody PedidoEntity pedido){
+    public ResponseEntity<CardapioEntity> update(@PathVariable Integer id, @RequestBody CardapioEntity cardapio){
         try {
-            var result = pedidoService.update(Long.valueOf(id), pedido);
+            var result = cardapioService.update(Long.valueOf(id), cardapio);
             return new ResponseEntity<>(result, HttpStatus.OK);
         } catch (Exception ex){
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
@@ -60,7 +61,7 @@ public class PedidoController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id){
         try {
-            pedidoService.delete(Long.valueOf(id));
+            cardapioService.delete(Long.valueOf(id));
             return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
         } catch (Exception ex){
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
