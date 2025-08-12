@@ -1,5 +1,6 @@
 package com.Restaurante.Dove.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,10 +23,12 @@ public class CardapioEntity {
     @Column(name = "data", nullable = false)
     private LocalDate data;
 
-    @OneToMany(mappedBy = "cardapio", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties({"marmita", "status", "hora_inicio", "hora_fim", "cardapio", "funcionario", "cliente", "ingredientes"})
+//    @OneToMany(mappedBy = "cardapio", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "cardapio", cascade = CascadeType.ALL)
     private List<PedidoEntity> pedidos;
-//    private List<PedidoEntity> pedidos = new ArrayList<>();
 
+    @JsonIgnoreProperties({"descricao", "pedidos", "cardapios"})
     @ManyToMany
     @JoinTable(
             name = "tb_cardapio_ingrediente",
@@ -33,5 +36,4 @@ public class CardapioEntity {
             inverseJoinColumns = @JoinColumn(name = "ingrediente_id")
     )
     private List<IngredienteEntity> ingredientes;
-//    private List<IngredienteEntity> ingredientes = new ArrayList<>();
 }

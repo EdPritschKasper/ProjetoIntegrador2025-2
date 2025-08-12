@@ -34,7 +34,7 @@ CREATE TABLE tb_pedido (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     marmita VARCHAR(20),
     status VARCHAR(10),
-    hora_inicio TIME NOT NULL,
+    hora_inicio TIME,
     hora_fim TIME,
     cardapio_id BIGINT,
     funcionario_id BIGINT,

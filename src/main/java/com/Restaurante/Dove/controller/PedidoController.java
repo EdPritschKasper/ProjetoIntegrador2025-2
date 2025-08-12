@@ -16,16 +16,6 @@ public class PedidoController {
 
     private final PedidoService pedidoService;
 
-//    @PostMapping
-//    public ResponseEntity<PedidoEntity> save(@RequestBody PedidoEntity pedido){
-//        try {
-//            var result = pedidoService.save(pedido);
-//            return new ResponseEntity<>(result, HttpStatus.CREATED);
-//        } catch (Exception ex){
-//            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-//        }
-//    }
-
     @PostMapping
     public ResponseEntity<PedidoEntity> save(@RequestBody PedidoEntity pedido){
         try {
