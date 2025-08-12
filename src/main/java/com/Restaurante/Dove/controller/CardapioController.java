@@ -49,12 +49,20 @@ public class CardapioController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CardapioEntity> update(@PathVariable Integer id, @RequestBody CardapioEntity cardapio){
+    public ResponseEntity<?> update(@PathVariable Integer id, @RequestBody CardapioEntity cardapio) {
         try {
             var result = cardapioService.update(Long.valueOf(id), cardapio);
-            return new ResponseEntity<>(result, HttpStatus.OK);
-        } catch (Exception ex){
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+
+            if (result == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("Cardápio com ID " + id + " não encontrado.");
+            }
+
+            return ResponseEntity.ok(result);
+        } catch (Exception ex) {
+            ex.printStackTrace(); // para debug
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Erro ao atualizar cardápio: " + ex.getMessage());
         }
     }
 

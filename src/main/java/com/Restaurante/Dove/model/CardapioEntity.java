@@ -24,7 +24,8 @@ public class CardapioEntity {
     private LocalDate data;
 
     @JsonIgnoreProperties({"marmita", "status", "hora_inicio", "hora_fim", "cardapio", "funcionario", "cliente", "ingredientes"})
-    @OneToMany(mappedBy = "cardapio", cascade = CascadeType.ALL, orphanRemoval = true)
+//    @OneToMany(mappedBy = "cardapio", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "cardapio", cascade = CascadeType.ALL)
     private List<PedidoEntity> pedidos;
 
     @JsonIgnoreProperties({"descricao", "pedidos", "cardapios"})
