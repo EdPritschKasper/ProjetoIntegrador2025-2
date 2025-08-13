@@ -1,6 +1,8 @@
 package com.Restaurante.Dove.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -30,8 +32,9 @@ public class ClienteEntity {
     @Column(nullable = false, length = 50)
     private String senha;
 
-    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
+    @JsonIgnoreProperties({"marmita","status","hora_inicio","hora_fim","cardapio" , "cliente" , "funcionario" , "ingredientes"})
     private List<PedidoEntity> pedidos;
-//    private List<PedidoEntity> pedidos = new ArrayList<>();
+
 
 }

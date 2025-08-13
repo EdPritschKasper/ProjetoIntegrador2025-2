@@ -1,5 +1,6 @@
 package com.Restaurante.Dove.service;
 
+import com.Restaurante.Dove.model.PedidoEntity;
 import com.Restaurante.Dove.repository.ClienteRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
@@ -18,10 +19,23 @@ public class ClienteService {
     }
 
     public ClienteEntity save(ClienteEntity cliente) {
-        if (cliente.getSenha() != null) {
-            return clienteRepository.save(cliente);
+        if (cliente.getNome() != null && cliente.getNome().trim().isEmpty()){
+            throw new IllegalArgumentException("Você deve preencher o nome");
         }
-            throw new RuntimeException("Senha deve ser preenchida");
+
+        if (cliente.getEmail() != null && cliente.getEmail().trim().isEmpty() && (!cliente.getEmail().endsWith("@gmail.com") &&
+                !cliente.getEmail().endsWith("@hotmail.com"))) {
+            throw new IllegalArgumentException("O email deve ser @gmail ou @hotmail");
+        }
+
+        if (cliente.getSenha() != null && cliente.getSenha().trim().isEmpty() &&
+                cliente.getSenha().length() < 3) {
+
+            throw new IllegalArgumentException("Senha deve ter mais de 3 caracters");
+        }
+
+        return clienteRepository.save(cliente);
+
     }
 
     public List<ClienteEntity> findAll() {return clienteRepository.findAll();
@@ -44,6 +58,10 @@ public class ClienteService {
 
         return clienteRepository.save(update);
     }
+    public long getPedidosById(long id){
+        return clienteRepository.getPedidosById(id);
+    }
+
 
     public void delete (Long id){
         ClienteEntity delete = findById(id);
