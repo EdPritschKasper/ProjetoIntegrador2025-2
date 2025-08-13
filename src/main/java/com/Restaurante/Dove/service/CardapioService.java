@@ -72,4 +72,12 @@ public class CardapioService {
         }
         cardapioRepository.deleteById(Math.toIntExact(id));
     }
+
+    public Optional<CardapioEntity> findByPedidos(PedidoEntity pedido){
+        return cardapioRepository.findByPedidos(pedido);
+    }
+
+    public List<CardapioEntity> findByIngredientes(IngredienteEntity ingrediente){
+        return cardapioRepository.findByIngredientes(ingrediente);
+    }
 }
