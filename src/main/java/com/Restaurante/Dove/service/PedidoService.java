@@ -31,6 +31,8 @@ public class PedidoService {
             var cardapio = cardapioRepository.findById(Math.toIntExact(pedido.getCardapio().getId()))
                     .orElseThrow(() -> new RuntimeException("Cardápio não encontrado"));
             pedido.setCardapio(cardapio);
+        } else {
+            throw new RuntimeException("Nenhum cardápio informado para o pedido");
         }
 
         // Buscar funcionário
@@ -83,6 +85,8 @@ public class PedidoService {
                 var cardapio = cardapioRepository.findById(Math.toIntExact(pedidoAtualizado.getCardapio().getId()))
                         .orElseThrow(() -> new RuntimeException("Cardapio não encontrado"));
                 pedidoExistente.setCardapio(cardapio);
+            } else {
+                throw new RuntimeException("Nenhum cardápio informado para o pedido");
             }
 
             if (pedidoAtualizado.getFuncionario() != null && pedidoAtualizado.getFuncionario().getId() != null) {
