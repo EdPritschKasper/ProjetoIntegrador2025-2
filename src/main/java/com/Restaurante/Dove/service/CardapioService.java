@@ -25,7 +25,17 @@ public class CardapioService {
         return cardapioRepository.findAll();
     }
 
-    public CardapioEntity save(CardapioEntity cardapio){
+    public CardapioEntity save(CardapioEntity cardapio) {
+        if(cardapio.getData() == null) {
+            throw new RuntimeException("A data do cardápio é obrigatória");
+        }
+
+        for(CardapioEntity cardapioBanco : cardapioRepository.findAll()) {
+            if (cardapioBanco.getData() != null && cardapioBanco.getData().equals(cardapio.getData())) {
+                throw new RuntimeException("Já existe um cardápio cadastrado para a data " + cardapio.getData());
+            }
+        }
+
         return cardapioRepository.save(cardapio);
     }
 
@@ -71,5 +81,13 @@ public class CardapioService {
             throw new RuntimeException("Cardapio não encontrado com id: " + id);
         }
         cardapioRepository.deleteById(Math.toIntExact(id));
+    }
+
+    public Optional<CardapioEntity> findByPedidos(PedidoEntity pedido){
+        return cardapioRepository.findByPedidos(pedido);
+    }
+
+    public List<CardapioEntity> findByIngredientes(IngredienteEntity ingrediente){
+        return cardapioRepository.findByIngredientes(ingrediente);
     }
 }

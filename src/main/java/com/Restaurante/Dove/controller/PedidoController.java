@@ -1,5 +1,6 @@
 package com.Restaurante.Dove.controller;
 
+import com.Restaurante.Dove.model.CardapioEntity;
 import com.Restaurante.Dove.model.PedidoEntity;
 import com.Restaurante.Dove.service.PedidoService;
 import lombok.RequiredArgsConstructor;
@@ -7,7 +8,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/pedidos")
@@ -62,6 +65,46 @@ public class PedidoController {
         try {
             pedidoService.delete(Long.valueOf(id));
             return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
+        } catch (Exception ex){
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/findByCardapio")
+    public ResponseEntity<List<PedidoEntity>> findByCardapio(@RequestBody CardapioEntity cardapio) {
+        try {
+            var result = pedidoService.findByCardapio(cardapio);
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        } catch (Exception ex){
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/findByStatus")
+    public ResponseEntity<List<PedidoEntity>> findByStatus(@RequestParam String status) {
+        try {
+            var result = pedidoService.findByStatus(status);
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        } catch (Exception ex){
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/contar")
+    public ResponseEntity<Integer> contarPedidos(@RequestParam LocalDate data) {
+        try {
+            var result = pedidoService.contarPedidosPorData(data);
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        } catch (Exception ex){
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/media-mes")
+    public ResponseEntity<Double> mediaPedidosMes(@RequestParam int mes) {
+        try {
+            var result = pedidoService.mediaPedidosPorMes(mes);
+            return new ResponseEntity<>(result, HttpStatus.OK);
         } catch (Exception ex){
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }

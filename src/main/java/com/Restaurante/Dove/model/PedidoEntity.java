@@ -36,7 +36,7 @@ public class PedidoEntity {
 
     @JsonIgnoreProperties({"data", "pedidos", "ingredientes"})
     @ManyToOne
-    @JoinColumn(name = "cardapio_id")
+    @JoinColumn(name = "cardapio_id", nullable = false)
     private CardapioEntity cardapio;
 
     @JsonIgnoreProperties({"nome", "cpf", "pedidos"})
