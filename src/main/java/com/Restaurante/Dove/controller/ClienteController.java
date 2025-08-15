@@ -50,6 +50,16 @@ public class ClienteController {
         }
     }
 
+    @GetMapping("/listar-tempos/{id}")
+    public ResponseEntity<List<Integer>> listarTempos(@PathVariable Long id) {
+        try {
+            var result = clienteService.listarTempos(id);
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        } catch (Exception ex) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+    }
+
     @PostMapping("/save")
     public ResponseEntity<ClienteEntity> save(@RequestBody ClienteEntity cliente){
 
