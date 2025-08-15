@@ -7,12 +7,28 @@ import org.springframework.stereotype.Service;
 import com.Restaurante.Dove.model.ClienteEntity;
 
 
+import java.time.LocalTime;
 import java.util.List;
+import java.util.stream.Collector;
 
 @Service
 public class ClienteService {
 
     private final ClienteRepository clienteRepository;
+
+    private int tempoPedidos(PedidoEntity p) {
+
+        LocalTime ini = p.getHora_inicio();
+        LocalTime fim = p.getHora_fim();
+
+        int sIni = ini.toSecondOfDay();
+        int sFim = fim.toSecondOfDay();
+
+        int diffSeg = sFim - sIni;
+        if (diffSeg < 0) diffSeg += 24 * 3600;
+
+        return (int) Math.round(diffSeg / 60.0);
+    }
 
     public ClienteService(ClienteRepository clienteRepository) {
         this.clienteRepository = clienteRepository;
@@ -62,6 +78,17 @@ public class ClienteService {
         return clienteRepository.getPedidosById(id);
     }
 
+    public List<Integer> listarTempos(Long id) {
+        ClienteEntity cliente = clienteRepository.listarTempos(id);
+
+        var pedidos = cliente.getPedidos();
+        if (pedidos == null && pedidos.isEmpty()) return List.of();
+
+        return pedidos.stream()
+                .filter(p -> p.getHora_inicio() != null && p.getHora_fim() != null)
+                .map(this::tempoPedidos).toList();
+
+    }
 
     public void delete (Long id){
         ClienteEntity delete = findById(id);
