@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -97,5 +98,13 @@ public class FuncionarioService {
         resultado.put("quantidadePedidos", funcionarioMax.getPedidos().size());
 
         return resultado;
+    }
+
+    public List<FuncionarioEntity> findByNome(String nome) {
+        return funcionarioRepository.findByNome(nome);
+    }
+
+    public Optional<FuncionarioEntity> findByCpf(String cpf) {
+        return funcionarioRepository.findByCpf(cpf);
     }
 }

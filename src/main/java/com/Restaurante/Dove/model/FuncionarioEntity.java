@@ -30,6 +30,5 @@ public class FuncionarioEntity {
     @JsonIgnoreProperties({"marmita", "status", "hora_inicio", "hora_fim", "cardapio", "funcionario", "cliente", "ingredientes"})
     @OneToMany(mappedBy = "funcionario", cascade = CascadeType.ALL)
     private List<PedidoEntity> pedidos;
-//    private List<PedidoEntity> pedidos = new ArrayList<>();
 
 }

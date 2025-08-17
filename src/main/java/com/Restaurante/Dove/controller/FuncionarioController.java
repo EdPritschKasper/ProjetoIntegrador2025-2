@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("api/funcionario")
@@ -87,5 +88,24 @@ public class FuncionarioController {
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
     }
-    
+
+    @GetMapping("/findByNome")
+    public ResponseEntity<List<FuncionarioEntity>> findByNome(@RequestParam String nome) {
+        try {
+            var result = funcionarioService.findByNome(nome);
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        } catch (Exception ex) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/findByCpf")
+    public ResponseEntity<Optional<FuncionarioEntity>> findByCpf(@RequestParam String cpf) {
+        try {
+            var result = funcionarioService.findByCpf(cpf);
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        } catch (Exception ex) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+    }
 }
