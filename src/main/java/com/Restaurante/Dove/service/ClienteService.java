@@ -9,6 +9,7 @@ import com.Restaurante.Dove.model.ClienteEntity;
 
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collector;
 
 @Service
@@ -95,6 +96,13 @@ public class ClienteService {
         clienteRepository.delete(delete);
     }
 
+    public List<ClienteEntity> findByNome(String nome) {
+        return clienteRepository.findByNome(nome);
+    }
+
+    public Optional<ClienteEntity> findByEmail(String email) {
+        return clienteRepository.findByEmail(email);
+    }
 
 }
 

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import com.Restaurante.Dove.service.ClienteService;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/cliente")
@@ -90,6 +91,26 @@ public class ClienteController {
             return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
         } catch (Exception ex) {
             return new ResponseEntity<>(null , HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/findByNome")
+    public ResponseEntity<List<ClienteEntity>> findByNome(@RequestParam String nome) {
+        try {
+            var result = clienteService.findByNome(nome);
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        } catch (Exception ex) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/findByEmail")
+    public ResponseEntity<Optional<ClienteEntity>> findByEmail(@RequestParam String email) {
+        try {
+            var result = clienteService.findByEmail(email);
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        } catch (Exception ex) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
     }
 }
