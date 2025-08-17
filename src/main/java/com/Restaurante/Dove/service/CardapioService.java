@@ -49,7 +49,9 @@ public class CardapioService {
         CardapioEntity existente = cardapioRepository.findById(Math.toIntExact(id))
                 .orElseThrow(() -> new RuntimeException("Cardápio não encontrado"));
 
-        existente.setData(novoCardapio.getData());
+        if (novoCardapio.getData() != null) { // só atualiza se foi enviado
+            existente.setData(novoCardapio.getData());
+        }
 
         // Atualiza ingredientes
         existente.getIngredientes().clear();
@@ -67,13 +69,14 @@ public class CardapioService {
             for (PedidoEntity pedido : novoCardapio.getPedidos()) {
                 PedidoEntity pedidoGerenciado = pedidoRepository.findById(Math.toIntExact(pedido.getId()))
                         .orElseThrow(() -> new RuntimeException("Pedido não encontrado: " + pedido.getId()));
-                pedidoGerenciado.setCardapio(existente); // mantém vínculo
+                pedidoGerenciado.setCardapio(existente);
                 existente.getPedidos().add(pedidoGerenciado);
             }
         }
 
         return cardapioRepository.save(existente);
     }
+
 
 
     public void delete(Long id) {
