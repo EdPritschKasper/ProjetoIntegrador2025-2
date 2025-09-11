@@ -15,98 +15,62 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/pedidos")
 @RequiredArgsConstructor
+@CrossOrigin("*")
 public class PedidoController {
 
     private final PedidoService pedidoService;
 
     @PostMapping
     public ResponseEntity<PedidoEntity> save(@RequestBody PedidoEntity pedido){
-        try {
-            var result = pedidoService.save(pedido);
-            return new ResponseEntity<>(result, HttpStatus.CREATED);
-        } catch (Exception ex){
-            ex.printStackTrace(); // ou use um logger
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
+        var result = pedidoService.save(pedido);
+        return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
     @GetMapping
     public ResponseEntity<List<PedidoEntity>> findAll(){
-        try {
-            var result = pedidoService.findAll();
-            return new ResponseEntity<>(result, HttpStatus.OK);
-        } catch (Exception ex){
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
+        var result = pedidoService.findAll();
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<PedidoEntity> findById(@PathVariable Integer id){
-        try {
-            var result = pedidoService.findById(Long.valueOf(id));
-            return new ResponseEntity<>(result, HttpStatus.OK);
-        } catch (Exception ex){
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
+        var result = pedidoService.findById(Long.valueOf(id));
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<PedidoEntity> update(@PathVariable Integer id, @RequestBody PedidoEntity pedido){
-        try {
-            var result = pedidoService.update(Long.valueOf(id), pedido);
-            return new ResponseEntity<>(result, HttpStatus.OK);
-        } catch (Exception ex){
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
+        var result = pedidoService.update(Long.valueOf(id), pedido);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id){
-        try {
-            pedidoService.delete(Long.valueOf(id));
-            return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
-        } catch (Exception ex){
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
+        pedidoService.delete(Long.valueOf(id));
+        return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
     }
 
     @GetMapping("/findByCardapio")
     public ResponseEntity<List<PedidoEntity>> findByCardapio(@RequestBody CardapioEntity cardapio) {
-        try {
-            var result = pedidoService.findByCardapio(cardapio);
-            return new ResponseEntity<>(result, HttpStatus.OK);
-        } catch (Exception ex){
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
+        var result = pedidoService.findByCardapio(cardapio);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @GetMapping("/findByStatus")
     public ResponseEntity<List<PedidoEntity>> findByStatus(@RequestParam String status) {
-        try {
-            var result = pedidoService.findByStatus(status);
-            return new ResponseEntity<>(result, HttpStatus.OK);
-        } catch (Exception ex){
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
+        var result = pedidoService.findByStatus(status);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @GetMapping("/contar")
     public ResponseEntity<Integer> contarPedidos(@RequestParam LocalDate data) {
-        try {
-            var result = pedidoService.contarPedidosPorData(data);
-            return new ResponseEntity<>(result, HttpStatus.OK);
-        } catch (Exception ex){
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
+        var result = pedidoService.contarPedidosPorData(data);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @GetMapping("/media-mes")
     public ResponseEntity<Double> mediaPedidosMes(@RequestParam int mes) {
-        try {
-            var result = pedidoService.mediaPedidosPorMes(mes);
-            return new ResponseEntity<>(result, HttpStatus.OK);
-        } catch (Exception ex){
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
+        var result = pedidoService.mediaPedidosPorMes(mes);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 }
