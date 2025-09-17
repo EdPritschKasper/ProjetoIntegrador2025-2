@@ -18,7 +18,7 @@ public class CardapioEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "data", nullable = false)
+    @Column(name = "data", nullable = false, unique=true)
     private LocalDate data;
 
     @JsonIgnoreProperties({"marmita", "status", "hora_inicio", "hora_fim", "cardapio", "funcionario", "cliente", "ingredientes"})
@@ -26,7 +26,7 @@ public class CardapioEntity {
     @OneToMany(mappedBy = "cardapio", cascade = CascadeType.ALL)
     private List<PedidoEntity> pedidos;
 
-    @JsonIgnoreProperties({"descricao", "pedidos", "cardapios"})
+    @JsonIgnoreProperties({"pedidos", "cardapios"})
     @ManyToMany
     @JoinTable(
             name = "tb_cardapio_ingrediente",

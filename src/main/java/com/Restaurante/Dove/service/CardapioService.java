@@ -10,6 +10,7 @@ import jakarta.transaction.Transactional;
 import lombok.Data;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -92,5 +93,10 @@ public class CardapioService {
 
     public List<CardapioEntity> findByIngredientes(IngredienteEntity ingrediente){
         return cardapioRepository.findByIngredientes(ingrediente);
+    }
+
+    public CardapioEntity getCardapioDoDia() {
+        return cardapioRepository.findByData(LocalDate.now())
+                .orElseThrow(() -> new RuntimeException("Cardápio do dia não encontrado"));
     }
 }
