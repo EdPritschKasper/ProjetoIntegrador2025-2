@@ -67,4 +67,9 @@ public class CardapioController {
         var result = cardapioService.findByIngredientes(ingrediente);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
+
+    @GetMapping("/hoje")
+    public CardapioEntity getCardapioDoDia() {
+        return cardapioService.getCardapioDoDia();
+    }
 }
