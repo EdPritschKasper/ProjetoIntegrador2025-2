@@ -34,17 +34,17 @@ public class PedidoEntity {
     @Column(name = "hora_fim")
     private LocalTime hora_fim;
 
-    @JsonIgnoreProperties({"data", "pedidos", "ingredientes"})
+    @JsonIgnoreProperties({"pedidos", "ingredientes"})
     @ManyToOne
     @JoinColumn(name = "cardapio_id", nullable = false)
     private CardapioEntity cardapio;
 
-    @JsonIgnoreProperties({"nome", "cpf", "pedidos"})
+    @JsonIgnoreProperties({"cpf", "pedidos"})
     @ManyToOne
     @JoinColumn(name = "funcionario_id")
     private FuncionarioEntity funcionario;
 
-    @JsonIgnoreProperties({"nome", "email", "senha", "pedidos"})
+    @JsonIgnoreProperties({ "email", "senha", "pedidos"})
     @ManyToOne
     @JoinColumn(name = "cliente_id")
     private ClienteEntity cliente;
