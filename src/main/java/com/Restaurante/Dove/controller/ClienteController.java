@@ -1,11 +1,13 @@
 package com.Restaurante.Dove.controller;
 
-import com.Restaurante.Dove.model.*;
+import com.Restaurante.Dove.model.ClienteEntity;
+import com.Restaurante.Dove.repository.ClienteRepository;
+import com.Restaurante.Dove.service.ClienteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import com.Restaurante.Dove.service.ClienteService;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,6 +18,8 @@ import java.util.Optional;
 public class ClienteController {
 
     private final ClienteService clienteService;
+    private final ClienteRepository repo;
+    private final PasswordEncoder encoder;
 
     @GetMapping("/findAll")
     public ResponseEntity<List<ClienteEntity>> findAll(){
@@ -82,6 +86,22 @@ public class ClienteController {
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
 
+    }
+
+    @PutMapping("/{id}/senha")
+    public ResponseEntity<Object> trocarSenha(@PathVariable Long id,
+                                              @RequestParam String senhaAtual,
+                                              @RequestParam String novaSenha) {
+        return repo.findById(id)
+                .map(c -> {
+                    if (!encoder.matches(senhaAtual, c.getSenha())) {
+                        return ResponseEntity.status(401).build();
+                    }
+                    c.setSenha(encoder.encode(novaSenha));
+                    repo.save(c);
+                    return ResponseEntity.noContent().build();
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/delete/{id}")
