@@ -29,6 +29,7 @@ public class ClienteEntity {
     @Column(nullable = false, unique = true, length = 50)
     private String email;
 
+    @JsonIgnore
     @Column(nullable = false, length = 50)
     private String senha;
 

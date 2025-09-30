@@ -10,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -58,22 +59,40 @@ public class ClienteController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @PutMapping("/{id}/senha")
-    public ResponseEntity<Object> trocarSenha(@PathVariable Long id,
-                                              @RequestParam String senhaAtual,
-                                              @RequestParam String novaSenha) {
+    @PutMapping(path = "/senha/{id}", consumes = "application/json")
+    public ResponseEntity<?> trocarSenha(@PathVariable Long id,
+                                         @RequestBody Map<String, String> body) {
+        String senhaAtual  = body.get("senhaAtual");
+        String novaSenha   = body.get("novaSenha");
+        String confirmacao = body.get("confirmacao");
+
+        if (senhaAtual == null || senhaAtual.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Informe a senha atual."));
+        }
+        if (novaSenha == null || novaSenha.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Informe a nova senha."));
+        }
+        if (confirmacao != null && !novaSenha.equals(confirmacao)) {
+            return ResponseEntity.badRequest().body(Map.of("message", "As senhas não coincidem."));
+        }
+        if (novaSenha.length() < 8) {
+            return ResponseEntity.badRequest().body(Map.of("message", "A nova senha deve possuir ao menos 8 caracteres."));
+        }
+
         return repo.findById(id)
                 .map(c -> {
-                    if (!encoder.matches(senhaAtual, c.getSenha())) {
-                        return ResponseEntity.status(401).build();
+                    if (!senhaAtual.equals(c.getSenha())) { // sem hash, como você pediu
+                        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                                .body(Map.of("message", "Senha atual incorreta."));
                     }
-                    c.setSenha(encoder.encode(novaSenha));
+                    c.setSenha(novaSenha);
                     repo.save(c);
-                    return ResponseEntity.noContent().build();
+                    return ResponseEntity.noContent().build(); // 204 -> ResponseEntity<Void>
                 })
-                .orElse(ResponseEntity.notFound().build());
-    }
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("message", "Cliente não encontrado.")));
 
+    }
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id){
         clienteService.delete(id);
