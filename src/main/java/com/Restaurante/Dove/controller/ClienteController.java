@@ -81,13 +81,13 @@ public class ClienteController {
 
         return repo.findById(id)
                 .map(c -> {
-                    if (!senhaAtual.equals(c.getSenha())) { // sem hash, como você pediu
+                    if (!senhaAtual.equals(c.getSenha())) {
                         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                                 .body(Map.of("message", "Senha atual incorreta."));
                     }
                     c.setSenha(novaSenha);
                     repo.save(c);
-                    return ResponseEntity.noContent().build(); // 204 -> ResponseEntity<Void>
+                    return ResponseEntity.noContent().build();
                 })
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body(Map.of("message", "Cliente não encontrado.")));
@@ -100,14 +100,16 @@ public class ClienteController {
     }
 
     @GetMapping("/findByNome")
-    public ResponseEntity<List<ClienteEntity>> findByNome(@RequestParam String nome) {
-        var result = clienteService.findByNome(nome);
-        return new ResponseEntity<>(result, HttpStatus.OK);
+    public ResponseEntity<ClienteEntity> findByNome(@RequestParam String nome) {
+        return clienteService.findByEmail(nome)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @GetMapping("/findByEmail")
-    public ResponseEntity<Optional<ClienteEntity>> findByEmail(@RequestParam String email) {
-        var result = clienteService.findByEmail(email);
-        return new ResponseEntity<>(result, HttpStatus.OK);
+    public ResponseEntity<ClienteEntity> findByEmail(@RequestParam String email) {
+        return clienteService.findByEmail(email)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 }
