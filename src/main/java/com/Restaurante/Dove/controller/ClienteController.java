@@ -50,7 +50,7 @@ public class ClienteController {
     @PostMapping("/save")
     public ResponseEntity<ClienteEntity> save(@RequestBody ClienteEntity cliente){
         var result = clienteService.save(cliente);
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
     @PutMapping("/update/{id}")
