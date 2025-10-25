@@ -21,18 +21,18 @@ public class ClienteServiceIntegrationTest {
     @Autowired
     ClienteRepository clienteRepository;
 
-    ClienteEntity cliete;
+    ClienteEntity cliente;
 
     @BeforeEach
     void setUp() {
         clienteRepository.deleteAll();
 
-        cliete = new ClienteEntity();
-        cliete.setNome("NomeTeste");
-        cliete.setEmail("test@gmail.com");
-        cliete.setSenha("1111111");
+        cliente = new ClienteEntity();
+        cliente.setNome("NomeTeste");
+        cliente.setEmail("test@gmail.com");
+        cliente.setSenha("1111111");
 
-        clienteRepository.save(cliete);
+        clienteRepository.save(cliente);
     }
 
     @Test
@@ -47,24 +47,24 @@ public class ClienteServiceIntegrationTest {
         var response = clienteService.save(cNovo);
 
         Assertions.assertNotNull(response.getId());
-        Assertions.assertEquals("NomeTeste", response.getNome());
-        Assertions.assertEquals("test@gmail.com", response.getEmail());
-        Assertions.assertEquals("1111111", response.getSenha());
+        Assertions.assertEquals("Rogerio", response.getNome());
+        Assertions.assertEquals("teste@gmail.com", response.getEmail());
+        Assertions.assertEquals("123123123", response.getSenha());
     }
 
     @Test
     @DisplayName("2. Busca o cliente por Id")
     void findById() {
-        var found = clienteService.findById(cliete.getId());
+        var found = clienteService.findById(cliente.getId());
         Assertions.assertNotNull(found);
-        Assertions.assertEquals(cliete.getNome(), found.getNome());
+        Assertions.assertEquals(cliente.getNome(), found.getNome());
     }
 
     @Test
     @DisplayName("3.Deve deletar a conta do cliente")
     void delete() {
-        clienteService.delete(cliete.getId());
-        var result = clienteRepository.findById(cliete.getId());
+        clienteService.delete(cliente.getId());
+        var result = clienteRepository.findById(cliente.getId());
         Assertions.assertTrue(result.isEmpty());
     }
 
