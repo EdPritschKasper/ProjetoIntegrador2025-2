@@ -1,6 +1,7 @@
 package com.Restaurante.Dove.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
@@ -29,6 +30,7 @@ public class FuncionarioEntity {
 
     @JsonIgnoreProperties({"marmita", "status", "hora_inicio", "hora_fim", "cardapio", "funcionario", "cliente", "ingredientes"})
     @OneToMany(mappedBy = "funcionario", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<PedidoEntity> pedidos;
 
 }

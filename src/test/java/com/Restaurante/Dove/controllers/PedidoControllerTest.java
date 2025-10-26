@@ -19,6 +19,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -168,4 +169,33 @@ public class PedidoControllerTest {
         assertEquals(12.5, response.getBody());
         Mockito.verify(pedidoService, Mockito.times(1)).mediaPedidosPorMes(5);
     }
+
+    @Test
+    @DisplayName("Validar findById lança exceção se pedido não existir")
+    void scenarioFindByIdNotFound() {
+        Mockito.when(pedidoService.findById(99L)).thenThrow(new RuntimeException("Pedido não encontrado"));
+
+        Exception exception = assertThrows(RuntimeException.class, () -> pedidoController.findById(99));
+        assertEquals("Pedido não encontrado", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("Validar mediaPedidosMes com mês inválido")
+    void scenarioMediaPedidosMesInvalid() {
+        Mockito.when(pedidoService.mediaPedidosPorMes(0)).thenThrow(new IllegalArgumentException("Mês inválido"));
+
+        Exception ex = assertThrows(IllegalArgumentException.class, () -> pedidoController.mediaPedidosMes(0));
+        assertEquals("Mês inválido", ex.getMessage());
+    }
+
+    @Test
+    @DisplayName("Validar findByStatus retornando vazio")
+    void scenarioFindByStatusEmpty() {
+        Mockito.when(pedidoService.findByStatus("PRONTO")).thenReturn(List.of());
+
+        ResponseEntity<List<PedidoEntity>> response = pedidoController.findByStatus("PRONTO");
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertTrue(response.getBody().isEmpty());
+    }
+
 }
