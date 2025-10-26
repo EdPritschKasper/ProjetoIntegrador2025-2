@@ -1,6 +1,7 @@
 package com.Restaurante.Dove.services;
 
 import com.Restaurante.Dove.model.ClienteEntity;
+import com.Restaurante.Dove.model.PedidoEntity;
 import com.Restaurante.Dove.repository.ClienteRepository;
 import com.Restaurante.Dove.service.ClienteService;
 import jakarta.persistence.EntityNotFoundException;
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalTime;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -120,12 +122,12 @@ public class ClienteServiceTest {
 
         var entrada = new ClienteEntity();
         entrada.setNome("Novo Nome");
-        entrada.setSenha(null); // não alterar senha
+        entrada.setSenha(null);
 
         var atualizado = clienteService.update(1L, entrada);
 
         assertEquals("Novo Nome", atualizado.getNome());
-        assertEquals("123456", atualizado.getSenha()); // senha mantida
+        assertEquals("123456", atualizado.getSenha());
         verify(clienteRepository, times(1)).save(any(ClienteEntity.class));
     }
 
@@ -136,8 +138,8 @@ public class ClienteServiceTest {
         when(clienteRepository.save(any(ClienteEntity.class))).thenAnswer(inv -> inv.getArgument(0));
 
         var entrada = new ClienteEntity();
-        entrada.setSenha("novaSenha"); // service altera sempre que != null
-        entrada.setNome("   "); // nome em branco NÃO substitui (service exige !isBlank())
+        entrada.setSenha("novaSenha");
+        entrada.setNome("   ");
 
         var atualizado = clienteService.update(1L, entrada);
 
@@ -208,7 +210,7 @@ public class ClienteServiceTest {
     void scenario15() {
         ClienteEntity semPedidos = new ClienteEntity();
         semPedidos.setId(1L);
-        semPedidos.setPedidos(new ArrayList<>()); // lista vazia (evita NPE na implementação atual)
+        semPedidos.setPedidos(new ArrayList<>());
 
         when(clienteRepository.listarTempos(1L)).thenReturn(semPedidos);
 
@@ -219,4 +221,41 @@ public class ClienteServiceTest {
         verify(clienteRepository, times(1)).listarTempos(1L);
     }
 
+    @Test
+    @DisplayName("listarTempos - calcula minutos entre início e fim (mesmo dia)")
+    void scenario16() {
+        var pedido = new PedidoEntity();
+        pedido.setHora_inicio(LocalTime.of(10, 0));
+        pedido.setHora_fim(LocalTime.of(10, 30));
+
+        var cliente = new ClienteEntity();
+        cliente.setId(1L);
+        cliente.setPedidos(new ArrayList<>(List.of(pedido)));
+
+        when(clienteRepository.listarTempos(1L)).thenReturn(cliente);
+
+        var tempos = clienteService.listarTempos(1L);
+
+        assertEquals(List.of(30), tempos);
+        verify(clienteRepository, times(1)).listarTempos(1L);
+    }
+
+    @Test
+    @DisplayName("listarTempos - calcula minutos atravessando meia-noite")
+    void scenario17() {
+        var pedido = new PedidoEntity();
+        pedido.setHora_inicio(LocalTime.of(23, 50));
+        pedido.setHora_fim(LocalTime.of(0, 10)); // +20 min
+
+        var cliente = new ClienteEntity();
+        cliente.setId(2L);
+        cliente.setPedidos(new ArrayList<>(List.of(pedido)));
+
+        when(clienteRepository.listarTempos(2L)).thenReturn(cliente);
+
+        var tempos = clienteService.listarTempos(2L);
+
+        assertEquals(List.of(20), tempos);
+        verify(clienteRepository, times(1)).listarTempos(2L);
+    }
 }

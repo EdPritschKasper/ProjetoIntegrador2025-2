@@ -2,6 +2,8 @@ package com.Restaurante.Dove.controllers;
 
 import com.Restaurante.Dove.controller.CardapioController;
 import com.Restaurante.Dove.model.CardapioEntity;
+import com.Restaurante.Dove.model.IngredienteEntity;
+import com.Restaurante.Dove.model.PedidoEntity;
 import com.Restaurante.Dove.service.CardapioService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -12,16 +14,19 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+
 import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -37,6 +42,7 @@ public class CardapioControllerTest {
 
     private ObjectMapper objectMapper;
     private CardapioEntity cardapio;
+    private IngredienteEntity ingrediente;
 
     @BeforeEach
     void setUp() {
@@ -106,5 +112,79 @@ public class CardapioControllerTest {
                 .andExpect(status().isNoContent());
 
         verify(cardapioService, times(1)).delete(1L);
+    }
+
+    @Test
+    @DisplayName("Validar update - sucesso -> 200")
+    void update_sucesso() {
+        Integer id = 5;
+        var entrada = new CardapioEntity();
+        var atualizado = new CardapioEntity();
+        atualizado.setId(id.longValue());
+
+        when(cardapioService.update(id.longValue(), entrada)).thenReturn(atualizado);
+
+        ResponseEntity<?> response = cardapioController.update(id, entrada);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(atualizado, response.getBody());
+        verify(cardapioService, times(1)).update(id.longValue(), entrada);
+    }
+
+    @Test
+    @DisplayName("Validar update - não encontrado -> 404")
+    void update_naoEncontrado() {
+        Integer id = 7;
+        var entrada = new CardapioEntity();
+
+        when(cardapioService.update(id.longValue(), entrada)).thenReturn(null);
+
+        ResponseEntity<?> response = cardapioController.update(id, entrada);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals("Cardápio com ID " + id + " não encontrado.", response.getBody());
+        verify(cardapioService, times(1)).update(id.longValue(), entrada);
+    }
+
+    @Test
+    @DisplayName("Validar findByPedidos (Pedido) -> 200")
+    void findByPedidos_porPedido() {
+        var pedido = new PedidoEntity();
+        var card = new CardapioEntity();
+        when(cardapioService.findByPedidos(pedido)).thenReturn(Optional.of(card));
+
+        ResponseEntity<Optional<CardapioEntity>> response = cardapioController.findByPedidos(pedido);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(Optional.of(card), response.getBody());
+        verify(cardapioService, times(1)).findByPedidos(pedido);
+    }
+
+    @Test
+    @DisplayName("Validar findByIngredientes -> 200")
+    void findByPedidos_porIngrediente() {
+        var ingrediente = new IngredienteEntity();
+        var c1 = new CardapioEntity();
+        var c2 = new CardapioEntity();
+        List<CardapioEntity> esperado = List.of(c1, c2);
+        when(cardapioService.findByIngredientes(ingrediente)).thenReturn(esperado);
+
+        ResponseEntity<List<CardapioEntity>> response = cardapioController.findByPedidos(ingrediente);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(esperado, response.getBody());
+        verify(cardapioService, times(1)).findByIngredientes(ingrediente);
+    }
+
+    @Test
+    @DisplayName("Validar getCardapioDoDia -> 200 (retorno do serviço)")
+    void getCardapioDoDia() {
+        var esperado = new CardapioEntity();
+        when(cardapioService.getCardapioDoDia()).thenReturn(esperado);
+
+        CardapioEntity result = cardapioController.getCardapioDoDia();
+
+        assertEquals(esperado, result);
+        verify(cardapioService, times(1)).getCardapioDoDia();
     }
 }
