@@ -25,9 +25,9 @@ public class IngredienteEntity {
 
     @JsonIgnoreProperties({"marmita", "status", "hora_inicio", "hora_fim", "cardapio", "funcionario", "cliente", "ingredientes"})
     @ManyToMany(mappedBy = "ingredientes")
-    private List<PedidoEntity> pedidos;
+    private List<PedidoEntity> pedidos = new ArrayList<>();
 
     @JsonIgnoreProperties({"data", "pedidos", "ingredientes"})
     @ManyToMany(mappedBy = "ingredientes")
-    private List<CardapioEntity> cardapios;
+    private List<CardapioEntity> cardapios = new ArrayList<>();
 }

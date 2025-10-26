@@ -68,9 +68,10 @@ public class FuncionarioController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @GetMapping("/findByCpf")
-    public ResponseEntity<Optional<FuncionarioEntity>> findByCpf(@RequestParam String cpf) {
-        var result = funcionarioService.findByCpf(cpf);
-        return new ResponseEntity<>(result, HttpStatus.OK);
+    @GetMapping("/cpf/{cpf}")
+    public ResponseEntity<FuncionarioEntity> findByCpf(@PathVariable String cpf) {
+        return funcionarioService.findByCpf(cpf)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 }
