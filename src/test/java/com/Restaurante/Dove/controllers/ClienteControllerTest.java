@@ -1,9 +1,12 @@
 package com.Restaurante.Dove.controllers;
 
 import com.Restaurante.Dove.controller.ClienteController;
+import com.Restaurante.Dove.model.CardapioEntity;
+import com.Restaurante.Dove.model.PedidoEntity;
 import com.Restaurante.Dove.repository.ClienteRepository;
 import com.Restaurante.Dove.model.ClienteEntity;
 import com.Restaurante.Dove.service.ClienteService;
+import com.Restaurante.Dove.service.PedidoService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,13 +15,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalTime;
 import java.util.Map;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -36,11 +39,25 @@ public class ClienteControllerTest {
     private ClienteRepository repo;
     @Mock
     private ClienteEntity cliente;
+    @Mock
+    private PedidoService pedidoService;
+    @Mock
+    private PedidoEntity pedido;
+    @Mock
+    private CardapioEntity cardapio;
 
 
     @BeforeEach
     void setUp(){
         MockitoAnnotations.openMocks(this);
+
+        pedido = new PedidoEntity();
+        pedido.setId(2L);
+        pedido.setMarmita("Grande");
+        pedido.setStatus("Pronto");
+        pedido.setHora_inicio(LocalTime.of(10, 0));
+        pedido.setHora_fim(LocalTime.of(10, 30));
+        pedido.setCardapio(cardapio);
 
         cliente = new ClienteEntity();
         cliente.setId(1L);
@@ -126,15 +143,20 @@ public class ClienteControllerTest {
     }
 
     @Test
-    @DisplayName("Validar findByNome")
+    @DisplayName("Validar findByNome - encontrado -> 200")
     void scenario6() {
-        when(clienteService.findByEmail("Edkasper")).thenReturn(Optional.ofNullable(cliente));
+        String nome = "Edu";
+        ClienteEntity cliente = new ClienteEntity();
+        cliente.setId(1L);
+        cliente.setNome("Edu");
 
-        ResponseEntity<ClienteEntity> response = clienteController.findByEmail("Edkasper");
+        when(clienteService.findByEmail(nome)).thenReturn(Optional.of(cliente));
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
+        ResponseEntity<ClienteEntity> response = clienteController.findByNome(nome);
+
+        assertEquals(200, response.getStatusCode().value());
         assertEquals(cliente, response.getBody());
-        verify(clienteService, times(1)).findByEmail("Edkasper");
+        verify(clienteService, times(1)).findByEmail(nome);
     }
 
     @Test
@@ -169,4 +191,124 @@ public class ClienteControllerTest {
         assertEquals("novaSenha123", captor.getValue().getSenha());
     }
 
+    @Test
+    @DisplayName("Validar findPedidoById")
+    void scenario9() {
+        long expected = 7L;
+        when(clienteService.getPedidosById(2L)).thenReturn(expected);
+
+        ResponseEntity<Long> response = clienteController.findPedidoById(2L);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(expected, response.getBody());
+        verify(clienteService, times(1)).getPedidosById(2L);
+    }
+
+    @Test
+    @DisplayName("Validar listarTempos")
+    void scenario10() {
+        List<Integer> tempos = List.of(30, 45);
+        when(clienteService.listarTempos(2L)).thenReturn(tempos);
+        ResponseEntity<List<Integer>> response = clienteController.listarTempos(2L);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(tempos, response.getBody());
+        verify(clienteService, times(1)).listarTempos(2L);
+    }
+
+    @Test
+    @DisplayName("Validar Trocar Senha - Atual Errada")
+    void scenario11() {
+        Long id = 2L;
+        var cliente = new ClienteEntity();
+        cliente.setId(id);
+        cliente.setSenha("correta");
+
+        when(repo.findById(id)).thenReturn(Optional.of(cliente));
+
+        ResponseEntity<?> response = clienteController.trocarSenha(id, Map.of(
+                "senhaAtual", "errada",
+                "novaSenha", "novaSenha123",
+                "confirmacao", "novaSenha123"
+        ));
+
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+        assertTrue(((Map<?,?>)response.getBody()).get("message").toString().contains("Senha atual incorreta"));
+        verify(repo, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Validar Trocar Senha - Atual Blank")
+    void scenario12() {
+        Long id = 2L;
+
+        ResponseEntity<?> response = clienteController.trocarSenha(id, Map.of(
+                "novaSenha", "novaSenha123",
+                "confirmacao", "novaSenha123"
+        ));
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertTrue(((Map<?,?>) response.getBody()).get("message").toString().contains("Informe a senha atual."));
+        verify(repo, never()).findById(any());
+    }
+
+    @Test
+    @DisplayName("Validar Trocar Senha - Nova Blank")
+    void scenario13() {
+        Long id = 2L;
+
+        ResponseEntity<?> response = clienteController.trocarSenha(id, Map.of(
+                "senhaAtual", "senhaAtualValida",
+                "novaSenha", " ",
+                "confirmacao", "qualquer"
+        ));
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertTrue(((Map<?,?>) response.getBody()).get("message").toString().contains("Informe a nova senha."));
+        verify(repo, never()).findById(any());
+    }
+
+    @Test
+    @DisplayName("Validar Trocar Senha - Confirmação Errada")
+    void scenario14() {
+        Long id = 2L;
+
+        ResponseEntity<?> response = clienteController.trocarSenha(id, Map.of(
+                "senhaAtual", "senhaAtualValida",
+                "novaSenha", "novaSenha123",
+                "confirmacao", "outraSenha"
+        ));
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertTrue(((Map<?,?>) response.getBody()).get("message").toString().contains("As senhas não coincidem."));
+        verify(repo, never()).findById(any());
+    }
+
+    @Test
+    @DisplayName("Validar Trocar Senha - Senha curta")
+    void scenario15() {
+        Long id = 2L;
+
+        ResponseEntity<?> response = clienteController.trocarSenha(id, Map.of(
+                "senhaAtual", "senhaAtualValida",
+                "novaSenha", "curta",
+                "confirmacao", "curta"
+        ));
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertTrue(((Map<?,?>) response.getBody()).get("message").toString().contains("ao menos 8 caracteres"));
+        verify(repo, never()).findById(any());
+    }
+
+    @Test
+    @DisplayName("Validar findByNome - não encontrado -> 404")
+    void scenario16() {
+        String nome = "NaoExiste";
+        when(clienteService.findByEmail(nome)).thenReturn(Optional.empty());
+
+        ResponseEntity<ClienteEntity> response = clienteController.findByNome(nome);
+
+        assertEquals(404, response.getStatusCode().value());
+        assertNull(response.getBody());
+        verify(clienteService, times(1)).findByEmail(nome);
+    }
 }
