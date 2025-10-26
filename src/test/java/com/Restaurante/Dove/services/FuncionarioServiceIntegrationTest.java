@@ -3,13 +3,12 @@ package com.Restaurante.Dove.services;
 import com.Restaurante.Dove.model.FuncionarioEntity;
 import com.Restaurante.Dove.repository.FuncionarioRepository;
 import com.Restaurante.Dove.service.FuncionarioService;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -17,10 +16,14 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+//@SpringBootTest
+//@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY) // Usa H2
+//@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+//@Transactional
 @SpringBootTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY) // Usa H2
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-@Transactional
+@ActiveProfiles("test")
 public class FuncionarioServiceIntegrationTest {
 
     @Autowired

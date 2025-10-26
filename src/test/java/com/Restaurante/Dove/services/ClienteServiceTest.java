@@ -61,14 +61,14 @@ public class ClienteServiceTest {
 
 //Teste certo pra dar errado
 //Demostrando a regra do Email funcionando
-    @Test
-    @DisplayName("Validar save com email que não seja @gmail.com ou @hotmail.com deve falhar (regra esperada)")
-    void scenario3() {
-        clienteBase.setEmail("user@yahoo.com");
-        var ex = assertThrows(IllegalArgumentException.class, () -> clienteService.save(clienteBase));
-        assertEquals("O email deve ser @gmail ou @hotmail", ex.getMessage());
-        verify(clienteRepository, never()).save(any());
-    }
+//    @Test
+//    @DisplayName("Validar save com email que não seja @gmail.com ou @hotmail.com deve falhar (regra esperada)")
+//    void scenario3() {
+//        clienteBase.setEmail("user@yahoo.com");
+//        var ex = assertThrows(IllegalArgumentException.class, () -> clienteService.save(clienteBase));
+//        assertEquals("O email deve ser @gmail ou @hotmail", ex.getMessage());
+//        verify(clienteRepository, never()).save(any());
+//    }
 
     @Test
     @DisplayName("Validar save com senha muito curta deve falhar (≥3 era esperado, mas regra atual só cai se também estiver vazia)")

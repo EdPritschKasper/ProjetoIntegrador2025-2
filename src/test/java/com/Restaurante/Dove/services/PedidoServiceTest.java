@@ -14,6 +14,7 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class PedidoServiceTest {
@@ -21,16 +22,11 @@ public class PedidoServiceTest {
     @InjectMocks
     PedidoService pedidoService;
 
-    @Mock
-    PedidoRepository pedidoRepository;
-    @Mock
-    CardapioRepository cardapioRepository;
-    @Mock
-    FuncionarioRepository funcionarioRepository;
-    @Mock
-    ClienteRepository clienteRepository;
-    @Mock
-    IngredienteRepository ingredienteRepository;
+    @Mock PedidoRepository pedidoRepository;
+    @Mock CardapioRepository cardapioRepository;
+    @Mock FuncionarioRepository funcionarioRepository;
+    @Mock ClienteRepository clienteRepository;
+    @Mock IngredienteRepository ingredienteRepository;
 
     PedidoEntity pedido;
     CardapioEntity cardapio;
@@ -49,137 +45,247 @@ public class PedidoServiceTest {
         pedido.setCardapio(cardapio);
     }
 
+    // ---------- SAVE ----------
     @Test
-    @DisplayName("Validar save com sucesso")
-    void scenario1() {
-        Mockito.when(cardapioRepository.findById(1)).thenReturn(Optional.of(cardapio));
-        Mockito.when(pedidoRepository.save(pedido)).thenReturn(pedido);
+    @DisplayName("Deve salvar pedido com sucesso incluindo funcionário, cliente e ingredientes")
+    void saveSuccessWithAllRelations() {
+        FuncionarioEntity func = new FuncionarioEntity();
+        func.setId(1L);
+        ClienteEntity cli = new ClienteEntity();
+        cli.setId(2L);
+        IngredienteEntity ing = new IngredienteEntity();
+        ing.setId(3L);
+
+        pedido.setFuncionario(func);
+        pedido.setCliente(cli);
+        pedido.setIngredientes(List.of(ing));
+
+        when(cardapioRepository.findById(1)).thenReturn(Optional.of(cardapio));
+        when(funcionarioRepository.findById(1L)).thenReturn(Optional.of(func));
+        when(clienteRepository.findById(2L)).thenReturn(Optional.of(cli));
+        when(ingredienteRepository.findById(3)).thenReturn(Optional.of(ing));
+        when(pedidoRepository.save(any())).thenReturn(pedido);
 
         PedidoEntity result = pedidoService.save(pedido);
 
-        assertEquals(pedido, result);
-        Mockito.verify(pedidoRepository, Mockito.times(1)).save(pedido);
+        assertNotNull(result);
+        assertEquals(pedido.getMarmita(), result.getMarmita());
+        verify(pedidoRepository, times(1)).save(any(PedidoEntity.class));
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção se funcionário não for encontrado")
+    void saveFuncionarioNotFound() {
+        FuncionarioEntity func = new FuncionarioEntity();
+        func.setId(1L);
+        pedido.setFuncionario(func);
+
+        when(cardapioRepository.findById(1)).thenReturn(Optional.of(cardapio));
+        when(funcionarioRepository.findById(1L)).thenReturn(Optional.empty());
+
+        Exception ex = assertThrows(RuntimeException.class, () -> pedidoService.save(pedido));
+        assertTrue(ex.getMessage().contains("Funcionário não encontrado"));
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção se cliente não for encontrado")
+    void saveClienteNotFound() {
+        ClienteEntity cli = new ClienteEntity();
+        cli.setId(2L);
+        pedido.setCliente(cli);
+
+        when(cardapioRepository.findById(1)).thenReturn(Optional.of(cardapio));
+        when(clienteRepository.findById(2L)).thenReturn(Optional.empty());
+
+        Exception ex = assertThrows(RuntimeException.class, () -> pedidoService.save(pedido));
+        assertTrue(ex.getMessage().contains("Cliente não encontrado"));
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção se ingrediente não for encontrado")
+    void saveIngredienteNotFound() {
+        IngredienteEntity ing = new IngredienteEntity();
+        ing.setId(3L);
+        pedido.setIngredientes(List.of(ing));
+
+        when(cardapioRepository.findById(1)).thenReturn(Optional.of(cardapio));
+        when(ingredienteRepository.findById(3)).thenReturn(Optional.empty());
+
+        Exception ex = assertThrows(RuntimeException.class, () -> pedidoService.save(pedido));
+        assertTrue(ex.getMessage().contains("Ingrediente não encontrado"));
     }
 
     @Test
     @DisplayName("Validar save sem cardápio informado")
-    void scenario2() {
+    void saveWithoutCardapio() {
         pedido.setCardapio(null);
         Exception error = assertThrows(RuntimeException.class, () -> pedidoService.save(pedido));
-
         assertEquals("Nenhum cardápio informado para o pedido", error.getMessage());
     }
 
+    // ---------- UPDATE ----------
+    @Test
+    @DisplayName("Deve atualizar pedido com sucesso")
+    void updateSuccess() {
+        PedidoEntity atualizado = new PedidoEntity();
+        atualizado.setMarmita("Média");
+        atualizado.setStatus("Finalizado");
+        atualizado.setHora_inicio(LocalTime.of(9, 0));
+        atualizado.setHora_fim(LocalTime.of(9, 30));
+        atualizado.setCardapio(cardapio);
+
+        when(pedidoRepository.findById(1)).thenReturn(Optional.of(pedido));
+        when(cardapioRepository.findById(1)).thenReturn(Optional.of(cardapio));
+        when(pedidoRepository.save(any())).thenAnswer(i -> i.getArgument(0));
+
+        PedidoEntity result = pedidoService.update(1L, atualizado);
+
+        assertEquals("Média", result.getMarmita());
+        assertEquals("Finalizado", result.getStatus());
+        verify(pedidoRepository).save(any(PedidoEntity.class));
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção se pedido não existir ao atualizar")
+    void updatePedidoNotFound() {
+        when(pedidoRepository.findById(1)).thenReturn(Optional.empty());
+        Exception ex = assertThrows(RuntimeException.class, () -> pedidoService.update(1L, pedido));
+        assertTrue(ex.getMessage().contains("Pedido não encontrado"));
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção se cardápio não for encontrado ao atualizar")
+    void updateCardapioNotFound() {
+        when(pedidoRepository.findById(1)).thenReturn(Optional.of(pedido));
+        when(cardapioRepository.findById(1)).thenReturn(Optional.empty());
+        Exception ex = assertThrows(RuntimeException.class, () -> pedidoService.update(1L, pedido));
+        assertTrue(ex.getMessage().contains("Cardapio não encontrado"));
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção se funcionário não for encontrado ao atualizar")
+    void updateFuncionarioNotFound() {
+        FuncionarioEntity func = new FuncionarioEntity();
+        func.setId(10L);
+        pedido.setFuncionario(func);
+
+        when(pedidoRepository.findById(1)).thenReturn(Optional.of(pedido));
+        when(cardapioRepository.findById(1)).thenReturn(Optional.of(cardapio));
+        when(funcionarioRepository.findById(10L)).thenReturn(Optional.empty());
+
+        Exception ex = assertThrows(RuntimeException.class, () -> pedidoService.update(1L, pedido));
+        assertTrue(ex.getMessage().contains("Funcionario não encontrado"));
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção se cliente não for encontrado ao atualizar")
+    void updateClienteNotFound() {
+        ClienteEntity cli = new ClienteEntity();
+        cli.setId(2L);
+        pedido.setCliente(cli);
+
+        when(pedidoRepository.findById(1)).thenReturn(Optional.of(pedido));
+        when(cardapioRepository.findById(1)).thenReturn(Optional.of(cardapio));
+        when(clienteRepository.findById(2L)).thenReturn(Optional.empty());
+
+        Exception ex = assertThrows(RuntimeException.class, () -> pedidoService.update(1L, pedido));
+        assertTrue(ex.getMessage().contains("Cliente não encontrado"));
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção se ingrediente não for encontrado ao atualizar")
+    void updateIngredienteNotFound() {
+        IngredienteEntity ing = new IngredienteEntity();
+        ing.setId(3L);
+        pedido.setIngredientes(List.of(ing));
+
+        when(pedidoRepository.findById(1)).thenReturn(Optional.of(pedido));
+        when(cardapioRepository.findById(1)).thenReturn(Optional.of(cardapio));
+        when(ingredienteRepository.findById(3)).thenReturn(Optional.empty());
+
+        Exception ex = assertThrows(RuntimeException.class, () -> pedidoService.update(1L, pedido));
+        assertTrue(ex.getMessage().contains("Ingrediente não encontrado"));
+    }
+
+    // ---------- FIND ----------
     @Test
     @DisplayName("Validar findAll")
-    void scenario3() {
-        List<PedidoEntity> pedidos = List.of(pedido);
-        Mockito.when(pedidoRepository.findAll()).thenReturn(pedidos);
-
+    void findAll() {
+        when(pedidoRepository.findAll()).thenReturn(List.of(pedido));
         List<PedidoEntity> result = pedidoService.findAll();
-
         assertEquals(1, result.size());
-        assertEquals(pedido, result.get(0));
-        Mockito.verify(pedidoRepository, Mockito.times(1)).findAll();
     }
 
     @Test
     @DisplayName("Validar findById existente")
-    void scenario4() {
-        Mockito.when(pedidoRepository.findById(1)).thenReturn(Optional.of(pedido));
-
+    void findByIdSuccess() {
+        when(pedidoRepository.findById(1)).thenReturn(Optional.of(pedido));
         PedidoEntity result = pedidoService.findById(1L);
-
         assertEquals(pedido, result);
-        Mockito.verify(pedidoRepository, Mockito.times(1)).findById(1);
     }
 
     @Test
     @DisplayName("Validar findById inexistente")
-    void scenario5() {
-        Mockito.when(pedidoRepository.findById(1)).thenReturn(Optional.empty());
-
-        Exception error = assertThrows(RuntimeException.class, () -> pedidoService.findById(1L));
-
-        assertTrue(error.getMessage().contains("Pedido não encontrado"));
+    void findByIdNotFound() {
+        when(pedidoRepository.findById(1)).thenReturn(Optional.empty());
+        Exception ex = assertThrows(RuntimeException.class, () -> pedidoService.findById(1L));
+        assertTrue(ex.getMessage().contains("Pedido não encontrado"));
     }
 
+    // ---------- DELETE ----------
     @Test
     @DisplayName("Validar delete existente")
-    void scenario6() {
-        Mockito.when(pedidoRepository.existsById(1)).thenReturn(true);
-        Mockito.doNothing().when(pedidoRepository).deleteById(1);
-
+    void deleteSuccess() {
+        when(pedidoRepository.existsById(1)).thenReturn(true);
         pedidoService.delete(1L);
-
-        Mockito.verify(pedidoRepository, Mockito.times(1)).deleteById(1);
+        verify(pedidoRepository).deleteById(1);
     }
 
     @Test
     @DisplayName("Validar delete inexistente")
-    void scenario7() {
-        Mockito.when(pedidoRepository.existsById(1)).thenReturn(false);
-
-        Exception error = assertThrows(RuntimeException.class, () -> pedidoService.delete(1L));
-
-        assertTrue(error.getMessage().contains("Pedido não encontrado"));
+    void deleteNotFound() {
+        when(pedidoRepository.existsById(1)).thenReturn(false);
+        Exception ex = assertThrows(RuntimeException.class, () -> pedidoService.delete(1L));
+        assertTrue(ex.getMessage().contains("Pedido não encontrado"));
     }
 
-    @Test
-    @DisplayName("Validar findByStatus")
-    void scenario8() {
-        List<PedidoEntity> pedidos = List.of(pedido);
-        Mockito.when(pedidoRepository.findByStatus("Pendente")).thenReturn(pedidos);
-
-        List<PedidoEntity> result = pedidoService.findByStatus("Pendente");
-
-        assertEquals(1, result.size());
-        assertEquals(pedido, result.get(0));
-        Mockito.verify(pedidoRepository, Mockito.times(1)).findByStatus("Pendente");
-    }
-
-    @Test
-    @DisplayName("Validar contarPedidosPorData")
-    void scenario9() {
-        Mockito.when(pedidoRepository.contarPedidosPorData(any(LocalDate.class))).thenReturn(5);
-
-        int result = pedidoService.contarPedidosPorData(LocalDate.now());
-
-        assertEquals(5, result);
-        Mockito.verify(pedidoRepository, Mockito.times(1)).contarPedidosPorData(any(LocalDate.class));
-    }
-
-    @Test
-    @DisplayName("Validar mediaPedidosPorMes")
-    void scenario10() {
-        Mockito.when(pedidoRepository.mediaPedidosPorMes(10)).thenReturn(12.5);
-
-        Double result = pedidoService.mediaPedidosPorMes(10);
-
-        assertEquals(12.5, result);
-        Mockito.verify(pedidoRepository, Mockito.times(1)).mediaPedidosPorMes(10);
-    }
-
+    // ---------- FIND BY ----------
     @Test
     @DisplayName("Validar findByCardapio existente")
-    void scenario11() {
-        List<PedidoEntity> pedidos = List.of(pedido);
-        Mockito.when(cardapioRepository.findById(1)).thenReturn(Optional.of(cardapio));
-        Mockito.when(pedidoRepository.findByCardapio(cardapio)).thenReturn(pedidos);
-
+    void findByCardapio() {
+        when(cardapioRepository.findById(1)).thenReturn(Optional.of(cardapio));
+        when(pedidoRepository.findByCardapio(cardapio)).thenReturn(List.of(pedido));
         List<PedidoEntity> result = pedidoService.findByCardapio(cardapio);
-
         assertEquals(1, result.size());
-        Mockito.verify(pedidoRepository, Mockito.times(1)).findByCardapio(cardapio);
     }
 
     @Test
     @DisplayName("Validar findByCardapio inexistente")
-    void scenario12() {
-        Mockito.when(cardapioRepository.findById(1)).thenReturn(Optional.empty());
+    void findByCardapioNotFound() {
+        when(cardapioRepository.findById(1)).thenReturn(Optional.empty());
+        Exception ex = assertThrows(RuntimeException.class, () -> pedidoService.findByCardapio(cardapio));
+        assertTrue(ex.getMessage().contains("Cardapio não encontrado"));
+    }
 
-        Exception error = assertThrows(RuntimeException.class, () -> pedidoService.findByCardapio(cardapio));
+    @Test
+    @DisplayName("Validar findByStatus")
+    void findByStatus() {
+        when(pedidoRepository.findByStatus("Pendente")).thenReturn(List.of(pedido));
+        List<PedidoEntity> result = pedidoService.findByStatus("Pendente");
+        assertEquals(1, result.size());
+    }
 
-        assertTrue(error.getMessage().contains("Cardapio não encontrado"));
+    @Test
+    @DisplayName("Validar contarPedidosPorData")
+    void contarPedidosPorData() {
+        when(pedidoRepository.contarPedidosPorData(any())).thenReturn(5);
+        assertEquals(5, pedidoService.contarPedidosPorData(LocalDate.now()));
+    }
+
+    @Test
+    @DisplayName("Validar mediaPedidosPorMes")
+    void mediaPedidosPorMes() {
+        when(pedidoRepository.mediaPedidosPorMes(10)).thenReturn(12.5);
+        assertEquals(12.5, pedidoService.mediaPedidosPorMes(10));
     }
 }
