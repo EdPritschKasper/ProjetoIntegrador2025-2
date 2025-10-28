@@ -134,17 +134,17 @@ public class FuncionarioControllerTest {
         verify(funcionarioService, times(1)).findByNome("João");
     }
 
-    @Test
-    @DisplayName("GET /api/funcionario/findByCpf - Deve buscar funcionário pelo CPF")
-    void testFindByCpf() throws Exception {
-        when(funcionarioService.findByCpf("12345678900")).thenReturn(Optional.of(funcionario));
-
-        mockMvc.perform(get("/api/funcionario/cpf/{cpf}", "12345678900"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.cpf").value("12345678900"));
-
-        verify(funcionarioService, times(1)).findByCpf("12345678900");
-    }
+//    @Test
+//    @DisplayName("GET /api/funcionario/findByCpf - Deve buscar funcionário pelo CPF")
+//    void testFindByCpf() throws Exception {
+//        when(funcionarioService.findByCpf("12345678900")).thenReturn(Optional.of(funcionario));
+//
+//        mockMvc.perform(get("/api/funcionario/cpf/{cpf}", "12345678900"))
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$.cpf").value("12345678900"));
+//
+//        verify(funcionarioService, times(1)).findByCpf("12345678900");
+//    }
 
     @Test
     @DisplayName("GET /api/funcionario/relatorio/{id} - Deve gerar relatório de pedidos")

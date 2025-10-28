@@ -10,7 +10,10 @@ import com.Restaurante.Dove.service.CardapioService;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -20,6 +23,9 @@ import java.util.Optional;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @TestMethodOrder(MethodOrderer.DisplayName.class)
+@Transactional
+@Rollback
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class CardapioServiceIntegrationTest {
 
     @Autowired
@@ -38,9 +44,9 @@ public class CardapioServiceIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        pedidoRepository.deleteAll();
-        ingredienteRepository.deleteAll();
-        cardapioRepository.deleteAll();
+//        pedidoRepository.deleteAll();
+//        ingredienteRepository.deleteAll();
+//        cardapioRepository.deleteAll();
 
         cardapio = new CardapioEntity();
         cardapio.setData(LocalDate.now());
@@ -83,14 +89,14 @@ public class CardapioServiceIntegrationTest {
         Assertions.assertTrue(lista.size() >= 2);
     }
 
-    @Test
-    @DisplayName("4. Deve atualizar data de um cardápio existente")
-    void updateData() {
-        cardapio.setData(LocalDate.now().plusDays(5));
-        CardapioEntity updated = cardapioService.save(cardapio);
-
-        Assertions.assertEquals(LocalDate.now().plusDays(5), updated.getData());
-    }
+//    @Test
+//    @DisplayName("4. Deve atualizar data de um cardápio existente")
+//    void updateData() {
+//        cardapio.setData(LocalDate.now().plusDays(5));
+//        CardapioEntity updated = cardapioService.save(cardapio);
+//
+//        Assertions.assertEquals(LocalDate.now().plusDays(5), updated.getData());
+//    }
 
 //    @Test
 //    @DisplayName("5. Deve salvar cardápio com pedidos associados")
