@@ -1,69 +1,66 @@
 package com.Restaurante.Dove.controller;
 
-import com.Restaurante.Dove.model.ClienteEntity;
-import com.Restaurante.Dove.repository.ClienteRepository;
-import com.Restaurante.Dove.service.ClienteService;
+import com.Restaurante.Dove.model.UsuarioEntity;
+import com.Restaurante.Dove.repository.UsuarioRepository;
+import com.Restaurante.Dove.service.UsuarioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/cliente")
+@RequestMapping("/api/usuario")
 @RequiredArgsConstructor
 @CrossOrigin("*")
-public class ClienteController {
+public class UsuarioController {
 
-    private final ClienteService clienteService;
-    private final ClienteRepository repo;
-    private final PasswordEncoder encoder;
+    private final UsuarioService usuarioService;
+    private final UsuarioRepository repo;
 
     @GetMapping("/findAll")
-    public ResponseEntity<List<ClienteEntity>> findAll(){
-        var result = clienteService.findAll();
-        return new ResponseEntity<>(result , HttpStatus.OK);
+    public ResponseEntity<List<UsuarioEntity>> findAll() {
+        var result = usuarioService.findAll();
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @GetMapping("/findById/{id}")
-    public ResponseEntity<ClienteEntity> findById(@PathVariable Long id){
-        var result = clienteService.findById(id);
+    public ResponseEntity<UsuarioEntity> findById(@PathVariable Long id) {
+        var result = usuarioService.findById(id);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @GetMapping("/findPedido/{id}")
-    public ResponseEntity<Long> findPedidoById(@PathVariable Long id){
-        var result = clienteService.getPedidosById(id);
-        return new ResponseEntity<>(result , HttpStatus.OK);
+    public ResponseEntity<Long> findPedidoById(@PathVariable Long id) {
+        var result = usuarioService.getPedidosById(id);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @GetMapping("/listar-tempos/{id}")
     public ResponseEntity<List<Integer>> listarTempos(@PathVariable Long id) {
-        var result = clienteService.listarTempos(id);
+        var result = usuarioService.listarTempos(id);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @PostMapping("/save")
-    public ResponseEntity<ClienteEntity> save(@RequestBody ClienteEntity cliente){
-        var result = clienteService.save(cliente);
+    public ResponseEntity<UsuarioEntity> save(@RequestBody UsuarioEntity usuario) {
+        var result = usuarioService.save(usuario);
         return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<ClienteEntity> update(@PathVariable Long id , @RequestBody ClienteEntity cliente){
-        var result = clienteService.update(id, cliente);
+    public ResponseEntity<UsuarioEntity> update(@PathVariable Long id, @RequestBody UsuarioEntity usuario) {
+        var result = usuarioService.update(id, usuario);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @PutMapping(path = "/senha/{id}", consumes = "application/json")
     public ResponseEntity<?> trocarSenha(@PathVariable Long id,
                                          @RequestBody Map<String, String> body) {
-        String senhaAtual  = body.get("senhaAtual");
-        String novaSenha   = body.get("novaSenha");
+        String senhaAtual = body.get("senhaAtual");
+        String novaSenha = body.get("novaSenha");
         String confirmacao = body.get("confirmacao");
 
         if (senhaAtual == null || senhaAtual.isBlank()) {
@@ -80,35 +77,36 @@ public class ClienteController {
         }
 
         return repo.findById(id)
-                .map(c -> {
-                    if (!senhaAtual.equals(c.getSenha())) {
+                .map(u -> {
+                    if (!senhaAtual.equals(u.getSenha())) {
                         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                                 .body(Map.of("message", "Senha atual incorreta."));
                     }
-                    c.setSenha(novaSenha);
-                    repo.save(c);
+                    u.setSenha(novaSenha);
+                    repo.save(u);
                     return ResponseEntity.noContent().build();
                 })
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Map.of("message", "Cliente não encontrado.")));
-
+                        .body(Map.of("message", "Usuário não encontrado.")));
     }
+
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id){
-        clienteService.delete(id);
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        usuarioService.delete(id);
         return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
     }
 
     @GetMapping("/findByNome")
-    public ResponseEntity<ClienteEntity> findByNome(@RequestParam String nome) {
-        return clienteService.findByEmail(nome)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<List<UsuarioEntity>> findByNome(@RequestParam String nome) {
+        var result = usuarioService.findAll().stream()
+                .filter(u -> u.getNome() != null && u.getNome().equalsIgnoreCase(nome))
+                .toList();
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @GetMapping("/findByEmail")
-    public ResponseEntity<ClienteEntity> findByEmail(@RequestParam String email) {
-        return clienteService.findByEmail(email)
+    public ResponseEntity<UsuarioEntity> findByEmail(@RequestParam String email) {
+        return usuarioService.findByEmail(email)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }

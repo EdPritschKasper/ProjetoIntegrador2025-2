@@ -1,7 +1,6 @@
 package com.Restaurante.Dove.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.Restaurante.Dove.model.UsuarioEntity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -39,15 +38,10 @@ public class PedidoEntity {
     @JoinColumn(name = "cardapio_id", nullable = false)
     private CardapioEntity cardapio;
 
-    @JsonIgnoreProperties({"cpf", "pedidos"})
+    @JsonIgnoreProperties({"cpf", "email", "senha", "pedidos"})
     @ManyToOne
-    @JoinColumn(name = "funcionario_id")
-    private FuncionarioEntity funcionario;
-
-    @JsonIgnoreProperties({ "email", "senha", "pedidos"})
-    @ManyToOne
-    @JoinColumn(name = "cliente_id")
-    private ClienteEntity cliente;
+    @JoinColumn(name = "usuario_id")
+    private UsuarioEntity usuario;
 
     @JsonIgnoreProperties({"descricao", "pedidos", "cardapios"})
     @ManyToMany
