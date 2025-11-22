@@ -6,6 +6,7 @@ import com.Restaurante.Dove.model.UsuarioEntity;
 import com.Restaurante.Dove.repository.UsuarioRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalTime;
@@ -17,6 +18,7 @@ import java.util.Optional;
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder;
 
     private int tempoPedidos(PedidoEntity p) {
         LocalTime ini = p.getHora_inicio();
@@ -45,8 +47,8 @@ public class UsuarioService {
                     usuario.getSenha().length() < 3) {
                 throw new IllegalArgumentException("Senha deve ter mais de 3 caracteres");
             }
+            usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
         }
-
 
         if (usuario.getTipo() == TipoUsuario.FUNCIONARIO) {
             if (usuario.getCpf() == null || usuario.getCpf().trim().isEmpty()) {
@@ -72,11 +74,12 @@ public class UsuarioService {
         if (usuario.getNome() != null && !usuario.getNome().isBlank()) {
             update.setNome(usuario.getNome());
         }
-        if (usuario.getSenha() != null) {
-            update.setSenha(usuario.getSenha());
+        if (usuario.getSenha() != null && !usuario.getSenha().isBlank()) {
+            update.setSenha(passwordEncoder.encode(usuario.getSenha()));
         }
 
         return usuarioRepository.save(update);
+
     }
 
     public void delete(Long id) {

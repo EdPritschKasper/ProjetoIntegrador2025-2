@@ -32,7 +32,7 @@ public class UsuarioEntity {
     @Column(unique = true, length = 50)
     private String email;
 
-    @Column(length = 50)
+    @Column(length = 60)
     private String senha;
 
     @Enumerated(EnumType.STRING)
