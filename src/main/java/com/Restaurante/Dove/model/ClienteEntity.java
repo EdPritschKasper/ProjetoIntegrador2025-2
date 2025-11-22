@@ -30,7 +30,7 @@ public class ClienteEntity {
     private String email;
 
 //    @JsonIgnore
-    @Column(nullable = false, length = 50)
+    @Column(nullable = false, length = 60)
     private String senha;
 
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)

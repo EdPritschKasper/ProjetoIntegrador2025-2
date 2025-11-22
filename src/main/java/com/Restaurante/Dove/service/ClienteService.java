@@ -3,6 +3,7 @@ package com.Restaurante.Dove.service;
 import com.Restaurante.Dove.model.PedidoEntity;
 import com.Restaurante.Dove.repository.ClienteRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.Restaurante.Dove.model.ClienteEntity;
 
@@ -16,6 +17,7 @@ import java.util.stream.Collector;
 public class ClienteService {
 
     private final ClienteRepository clienteRepository;
+    private final PasswordEncoder passwordEncoder;
 
     private int tempoPedidos(PedidoEntity p) {
 
@@ -31,8 +33,9 @@ public class ClienteService {
         return (int) Math.round(diffSeg / 60.0);
     }
 
-    public ClienteService(ClienteRepository clienteRepository) {
+    public ClienteService(ClienteRepository clienteRepository, PasswordEncoder passwordEncoder) {
         this.clienteRepository = clienteRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public ClienteEntity save(ClienteEntity cliente) {
@@ -45,14 +48,18 @@ public class ClienteService {
             throw new IllegalArgumentException("O email deve ser @gmail ou @hotmail");
         }
 
-        if (cliente.getSenha() != null && cliente.getSenha().trim().isEmpty() &&
-                cliente.getSenha().length() < 3) {
+        if (cliente.getSenha() != null) {
+            if (cliente.getSenha().trim().isEmpty() || cliente.getSenha().length() < 3) {
+                throw new IllegalArgumentException("Senha deve ter mais de 3 caracters");
+            }
 
-            throw new IllegalArgumentException("Senha deve ter mais de 3 caracters");
+            String senhaEncriptada = passwordEncoder.encode(cliente.getSenha());
+            cliente.setSenha(senhaEncriptada);
+        } else {
+            throw new IllegalArgumentException("Senha não pode ser nula");
         }
 
         return clienteRepository.save(cliente);
-
     }
 
     public List<ClienteEntity> findAll() {return clienteRepository.findAll();
@@ -69,12 +76,14 @@ public class ClienteService {
             update.setNome(cliente.getNome());
         }
 
-        if (cliente.getSenha() != null ){
-            update.setSenha(cliente.getSenha());
+        if (cliente.getSenha() != null && !cliente.getSenha().isBlank()){
+            String novaSenhaEncriptada = passwordEncoder.encode(cliente.getSenha());
+            update.setSenha(novaSenhaEncriptada);
         }
 
         return clienteRepository.save(update);
     }
+
     public long getPedidosById(long id){
         return clienteRepository.getPedidosById(id);
     }
