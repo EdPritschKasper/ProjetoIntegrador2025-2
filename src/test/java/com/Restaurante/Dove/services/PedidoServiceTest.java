@@ -24,8 +24,7 @@ public class PedidoServiceTest {
 
     @Mock PedidoRepository pedidoRepository;
     @Mock CardapioRepository cardapioRepository;
-    @Mock FuncionarioRepository funcionarioRepository;
-    @Mock ClienteRepository clienteRepository;
+    @Mock UsuarioRepository usuarioRepository;
     @Mock IngredienteRepository ingredienteRepository;
 
     PedidoEntity pedido;
@@ -46,60 +45,6 @@ public class PedidoServiceTest {
     }
 
     // ---------- SAVE ----------
-    @Test
-    @DisplayName("Deve salvar pedido com sucesso incluindo funcionário, cliente e ingredientes")
-    void saveSuccessWithAllRelations() {
-        FuncionarioEntity func = new FuncionarioEntity();
-        func.setId(1L);
-        ClienteEntity cli = new ClienteEntity();
-        cli.setId(2L);
-        IngredienteEntity ing = new IngredienteEntity();
-        ing.setId(3L);
-
-        pedido.setFuncionario(func);
-        pedido.setCliente(cli);
-        pedido.setIngredientes(List.of(ing));
-
-        when(cardapioRepository.findById(1)).thenReturn(Optional.of(cardapio));
-        when(funcionarioRepository.findById(1L)).thenReturn(Optional.of(func));
-        when(clienteRepository.findById(2L)).thenReturn(Optional.of(cli));
-        when(ingredienteRepository.findById(3)).thenReturn(Optional.of(ing));
-        when(pedidoRepository.save(any())).thenReturn(pedido);
-
-        PedidoEntity result = pedidoService.save(pedido);
-
-        assertNotNull(result);
-        assertEquals(pedido.getMarmita(), result.getMarmita());
-        verify(pedidoRepository, times(1)).save(any(PedidoEntity.class));
-    }
-
-    @Test
-    @DisplayName("Deve lançar exceção se funcionário não for encontrado")
-    void saveFuncionarioNotFound() {
-        FuncionarioEntity func = new FuncionarioEntity();
-        func.setId(1L);
-        pedido.setFuncionario(func);
-
-        when(cardapioRepository.findById(1)).thenReturn(Optional.of(cardapio));
-        when(funcionarioRepository.findById(1L)).thenReturn(Optional.empty());
-
-        Exception ex = assertThrows(RuntimeException.class, () -> pedidoService.save(pedido));
-        assertTrue(ex.getMessage().contains("Funcionário não encontrado"));
-    }
-
-    @Test
-    @DisplayName("Deve lançar exceção se cliente não for encontrado")
-    void saveClienteNotFound() {
-        ClienteEntity cli = new ClienteEntity();
-        cli.setId(2L);
-        pedido.setCliente(cli);
-
-        when(cardapioRepository.findById(1)).thenReturn(Optional.of(cardapio));
-        when(clienteRepository.findById(2L)).thenReturn(Optional.empty());
-
-        Exception ex = assertThrows(RuntimeException.class, () -> pedidoService.save(pedido));
-        assertTrue(ex.getMessage().contains("Cliente não encontrado"));
-    }
 
     @Test
     @DisplayName("Deve lançar exceção se ingrediente não for encontrado")
@@ -160,36 +105,6 @@ public class PedidoServiceTest {
         when(cardapioRepository.findById(1)).thenReturn(Optional.empty());
         Exception ex = assertThrows(RuntimeException.class, () -> pedidoService.update(1L, pedido));
         assertTrue(ex.getMessage().contains("Cardapio não encontrado"));
-    }
-
-    @Test
-    @DisplayName("Deve lançar exceção se funcionário não for encontrado ao atualizar")
-    void updateFuncionarioNotFound() {
-        FuncionarioEntity func = new FuncionarioEntity();
-        func.setId(10L);
-        pedido.setFuncionario(func);
-
-        when(pedidoRepository.findById(1)).thenReturn(Optional.of(pedido));
-        when(cardapioRepository.findById(1)).thenReturn(Optional.of(cardapio));
-        when(funcionarioRepository.findById(10L)).thenReturn(Optional.empty());
-
-        Exception ex = assertThrows(RuntimeException.class, () -> pedidoService.update(1L, pedido));
-        assertTrue(ex.getMessage().contains("Funcionario não encontrado"));
-    }
-
-    @Test
-    @DisplayName("Deve lançar exceção se cliente não for encontrado ao atualizar")
-    void updateClienteNotFound() {
-        ClienteEntity cli = new ClienteEntity();
-        cli.setId(2L);
-        pedido.setCliente(cli);
-
-        when(pedidoRepository.findById(1)).thenReturn(Optional.of(pedido));
-        when(cardapioRepository.findById(1)).thenReturn(Optional.of(cardapio));
-        when(clienteRepository.findById(2L)).thenReturn(Optional.empty());
-
-        Exception ex = assertThrows(RuntimeException.class, () -> pedidoService.update(1L, pedido));
-        assertTrue(ex.getMessage().contains("Cliente não encontrado"));
     }
 
     @Test
