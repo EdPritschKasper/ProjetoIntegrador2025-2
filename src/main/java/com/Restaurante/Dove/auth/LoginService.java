@@ -2,6 +2,7 @@
 package com.Restaurante.Dove.auth;
 
 import com.Restaurante.Dove.config.JwtServiceGenerator;
+import com.Restaurante.Dove.model.UsuarioEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -35,7 +36,7 @@ public class LoginService {
 						login.getPassword()
 						)
 				);
-		Usuario user = repository.findByUsername(login.getUsername()).get();
+		UsuarioEntity user = repository.findByUsername(login.getUsername()).get();
 		String jwtToken = jwtService.generateToken(user);
 		return jwtToken;
 	}

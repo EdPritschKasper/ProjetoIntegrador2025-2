@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/usuario")
+@RequestMapping("/api/usuarios")
 @RequiredArgsConstructor
 @CrossOrigin("*")
 public class UsuarioController {
@@ -20,13 +20,13 @@ public class UsuarioController {
     private final UsuarioService usuarioService;
     private final UsuarioRepository repo;
 
-    @GetMapping("/findAll")
+    @GetMapping
     public ResponseEntity<List<UsuarioEntity>> findAll() {
         var result = usuarioService.findAll();
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @GetMapping("/findById/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<UsuarioEntity> findById(@PathVariable Long id) {
         var result = usuarioService.findById(id);
         return new ResponseEntity<>(result, HttpStatus.OK);
@@ -44,13 +44,13 @@ public class UsuarioController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @PostMapping("/save")
+    @PostMapping
     public ResponseEntity<UsuarioEntity> save(@RequestBody UsuarioEntity usuario) {
         var result = usuarioService.save(usuario);
         return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<UsuarioEntity> update(@PathVariable Long id, @RequestBody UsuarioEntity usuario) {
         var result = usuarioService.update(id, usuario);
         return new ResponseEntity<>(result, HttpStatus.OK);
@@ -90,7 +90,7 @@ public class UsuarioController {
                         .body(Map.of("message", "Usuário não encontrado.")));
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         usuarioService.delete(id);
         return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
