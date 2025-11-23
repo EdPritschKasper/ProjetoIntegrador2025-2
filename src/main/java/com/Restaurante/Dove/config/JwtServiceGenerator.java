@@ -2,7 +2,7 @@ package com.Restaurante.Dove.config;
 
 //JwtService.java
 
-import com.Restaurante.Dove.auth.Usuario;
+import com.Restaurante.Dove.model.UsuarioEntity;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -26,13 +26,13 @@ public class JwtServiceGenerator {
 	public static final SignatureAlgorithm ALGORITMO_ASSINATURA = SignatureAlgorithm.HS256;
 	public static final int HORAS_EXPIRACAO_TOKEN = 1;
 
-	public Map<String, Object> gerarPayload(Usuario usuario){
+	public Map<String, Object> gerarPayload(UsuarioEntity usuario){
 		//AQUI VOCÊ PODE COLOCAR O QUE MAIS VAI COMPOR O PAYLOAD DO TOKEN
 		
 		Map<String, Object> payloadData = new HashMap<>();
 		payloadData.put("username", usuario.getUsername());
 		payloadData.put("id", usuario.getId().toString());
-		payloadData.put("role", usuario.getRole());
+		payloadData.put("tipo", usuario.getTipo());
 		payloadData.put("outracoisa", "teste");
 		payloadData.put("outracoisa2", "teste");
 	
@@ -45,7 +45,7 @@ public class JwtServiceGenerator {
 	
 	
 	
-	public String generateToken(Usuario usuario) {
+	public String generateToken(UsuarioEntity usuario) {
 
 		Map<String, Object> payloadData = this.gerarPayload(usuario);
 
