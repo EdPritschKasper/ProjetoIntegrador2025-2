@@ -35,6 +35,12 @@ public class UsuarioService {
             throw new IllegalArgumentException("Você deve preencher o nome");
         }
 
+        if (usuario.getSenha() == null || usuario.getSenha().trim().isEmpty() ||
+                usuario.getSenha().length() < 3) {
+            throw new IllegalArgumentException("Senha deve ter mais de 3 caracteres");
+        }
+        usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
+
 
         if (usuario.getTipo() == TipoUsuario.CLIENTE) {
             if (usuario.getEmail() == null || usuario.getEmail().trim().isEmpty() ||
@@ -42,15 +48,7 @@ public class UsuarioService {
                             !usuario.getEmail().endsWith("@hotmail.com"))) {
                 throw new IllegalArgumentException("O email deve ser @gmail ou @hotmail");
             }
-
-            if (usuario.getSenha() == null || usuario.getSenha().trim().isEmpty() ||
-                    usuario.getSenha().length() < 3) {
-                throw new IllegalArgumentException("Senha deve ter mais de 3 caracteres");
-            }
-            usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
-        }
-
-        if (usuario.getTipo() == TipoUsuario.FUNCIONARIO) {
+        } else if (usuario.getTipo() == TipoUsuario.FUNCIONARIO) {
             if (usuario.getCpf() == null || usuario.getCpf().trim().isEmpty()) {
                 throw new IllegalArgumentException("CPF do funcionário é obrigatório.");
             }
