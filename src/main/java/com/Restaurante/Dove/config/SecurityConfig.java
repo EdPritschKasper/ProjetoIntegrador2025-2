@@ -36,6 +36,7 @@ public class SecurityConfig  {
 				.requestMatchers("/api/login").permitAll()
 				.requestMatchers("/api/usuarios").permitAll()
                         .requestMatchers("/api/usuarios/findByUsername").permitAll()
+                        .requestMatchers("/api/usuarios/findByEmail").permitAll()
                         .anyRequest()
                 .authenticated()
                     //    .permitAll()
