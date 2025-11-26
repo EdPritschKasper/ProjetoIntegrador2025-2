@@ -3,9 +3,11 @@ package com.Restaurante.Dove.controller;
 import com.Restaurante.Dove.model.UsuarioEntity;
 import com.Restaurante.Dove.repository.UsuarioRepository;
 import com.Restaurante.Dove.service.UsuarioService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -56,38 +58,29 @@ public class UsuarioController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @PutMapping(path = "/senha/{id}", consumes = "application/json")
+    @PutMapping("/senha/{id}")
     public ResponseEntity<?> trocarSenha(@PathVariable Long id,
                                          @RequestBody Map<String, String> body) {
-        String senhaAtual = body.get("senhaAtual");
-        String novaSenha = body.get("novaSenha");
-        String confirmacao = body.get("confirmacao");
+        try {
+            usuarioService.trocarSenha(
+                    id,
+                    body.get("senhaAtual"),
+                    body.get("novaSenha"),
+                    body.get("confirmacao")
+            );
+            return ResponseEntity.noContent().build();
 
-        if (senhaAtual == null || senhaAtual.isBlank()) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Informe a senha atual."));
-        }
-        if (novaSenha == null || novaSenha.isBlank()) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Informe a nova senha."));
-        }
-        if (confirmacao != null && !novaSenha.equals(confirmacao)) {
-            return ResponseEntity.badRequest().body(Map.of("message", "As senhas não coincidem."));
-        }
-        if (novaSenha.length() < 8) {
-            return ResponseEntity.badRequest().body(Map.of("message", "A nova senha deve possuir ao menos 8 caracteres."));
-        }
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("", e.getMessage()));
 
-        return repo.findById(id)
-                .map(u -> {
-                    if (!senhaAtual.equals(u.getSenha())) {
-                        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                                .body(Map.of("message", "Senha atual incorreta."));
-                    }
-                    u.setSenha(novaSenha);
-                    repo.save(u);
-                    return ResponseEntity.noContent().build();
-                })
-                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Map.of("message", "Usuário não encontrado.")));
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("", e.getMessage()));
+
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("", e.getMessage()));
+        }
     }
 
     @DeleteMapping("/{id}")
