@@ -110,4 +110,11 @@ public class UsuarioController {
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
+
+    @GetMapping("/findByUsername")
+    public ResponseEntity<UsuarioEntity> findByUsername(@RequestParam String username) {
+        return usuarioService.findByUsername(username)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
 }

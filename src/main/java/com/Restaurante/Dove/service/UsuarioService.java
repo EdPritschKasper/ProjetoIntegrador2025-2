@@ -104,6 +104,10 @@ public class UsuarioService {
         return usuarioRepository.findByEmail(email);
     }
 
+    public Optional<UsuarioEntity> findByUsername(String username) {
+        return usuarioRepository.findByUsername(username);
+    }
+
     public Optional<UsuarioEntity> findByCpf(String cpf) {
         return usuarioRepository.findByCpf(cpf);
     }

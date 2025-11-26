@@ -35,7 +35,7 @@ public class SecurityConfig  {
 		.authorizeHttpRequests((requests) -> requests
 				.requestMatchers("/api/login").permitAll()
 				.requestMatchers("/api/usuarios").permitAll()
-                        .requestMatchers("/api/usuarios/findByEmail").permitAll()
+                        .requestMatchers("/api/usuarios/findByUsername").permitAll()
                         .anyRequest()
                 .authenticated()
                     //    .permitAll()
