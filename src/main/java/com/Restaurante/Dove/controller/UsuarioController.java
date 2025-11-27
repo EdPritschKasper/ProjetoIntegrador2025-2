@@ -7,7 +7,6 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -102,5 +101,17 @@ public class UsuarioController {
         return usuarioService.findByEmail(email)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/relatorio/{id}")
+    public ResponseEntity<Map<String, Object>> gerarRelatorioPedidos(@PathVariable Long id) {
+        var result = usuarioService.gerarRelatorioPedidos(id);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    @GetMapping("/funcionarioMP")
+    public ResponseEntity<Map<String, Object>> funcionarioMaisPedidos() {
+        var result = usuarioService.funcionarioMaisPedidos();
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 }

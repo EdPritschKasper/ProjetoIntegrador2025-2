@@ -10,8 +10,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -133,5 +136,42 @@ public class UsuarioService {
 
         usuario.setSenha(passwordEncoder.encode(novaSenha));
         usuarioRepository.save(usuario);
+    }
+    public Map<String, Object> gerarRelatorioPedidos(Long funcionarioId) {
+        UsuarioEntity funcionario = usuarioRepository.findById(funcionarioId)
+                .orElseThrow(() -> new RuntimeException("Funcionário não encontrado com id: " + funcionarioId));
+
+        List<Map<String, Object>> pedidosResumo = funcionario.getPedidos().stream()
+                .map(p -> {
+                    Map<String, Object> resumo = new HashMap<>();
+                    resumo.put("pedidoId", p.getId());
+                    resumo.put("status", p.getStatus());
+                    resumo.put("horaInicio", p.getHora_inicio());
+                    resumo.put("horaFim", p.getHora_fim());
+                    return resumo;
+                }).collect(Collectors.toList());
+
+        Map<String, Object> relatorio = new HashMap<>();
+        relatorio.put("funcionarioNome", funcionario.getNome());
+        relatorio.put("funcionarioCpf", funcionario.getCpf());
+        relatorio.put("quantidadePedidos", pedidosResumo.size());
+        relatorio.put("pedidos", pedidosResumo);
+
+        return relatorio;
+    }
+
+    public Map<String, Object> funcionarioMaisPedidos() {
+        List<UsuarioEntity> funcionarios = usuarioRepository.findAll();
+
+        UsuarioEntity funcionarioMax = funcionarios.stream()
+                .max((f1, f2) -> Integer.compare(f1.getPedidos().size(), f2.getPedidos().size()))
+                .orElseThrow(() -> new RuntimeException("Nenhum funcionário encontrado"));
+
+        Map<String, Object> resultado = new HashMap<>();
+        resultado.put("funcionarioNome", funcionarioMax.getNome());
+        resultado.put("funcionarioCpf", funcionarioMax.getCpf());
+        resultado.put("quantidadePedidos", funcionarioMax.getPedidos().size());
+
+        return resultado;
     }
 }
