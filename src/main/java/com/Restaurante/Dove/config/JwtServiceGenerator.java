@@ -22,11 +22,15 @@ public class JwtServiceGenerator {
 
 	///////////////////////////////////////////////////////
 	//Parâmetros para geração do token
-	public static final String SECRET_KEY = "UMACHAVESECRETADASUAAPIAQUIUMACHAVESECRETADASUAAPIAQUIUMACHAVESECRETADASUAAPIAQUIUMACHAVESECRETADASUAAPIAQUI";
-	public static final SignatureAlgorithm ALGORITMO_ASSINATURA = SignatureAlgorithm.HS256;
-	public static final int HORAS_EXPIRACAO_TOKEN = 1;
+    public static final String SECRET_KEY = System.getenv("SECRET_KEY");
 
-	public Map<String, Object> gerarPayload(UsuarioEntity usuario){
+    public static final SignatureAlgorithm ALGORITMO_ASSINATURA =
+            SignatureAlgorithm.forName(System.getenv("JWT_ALGORITMO"));
+
+    public static final int HORAS_EXPIRACAO_TOKEN =
+            Integer.parseInt(System.getenv("HORAS_EXPIRACAO_TOKEN"));
+
+    public Map<String, Object> gerarPayload(UsuarioEntity usuario){
 		//AQUI VOCÊ PODE COLOCAR O QUE MAIS VAI COMPOR O PAYLOAD DO TOKEN
 		
 		Map<String, Object> payloadData = new HashMap<>();

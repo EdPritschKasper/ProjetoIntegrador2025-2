@@ -107,4 +107,31 @@ public class UsuarioService {
     public Optional<UsuarioEntity> findByCpf(String cpf) {
         return usuarioRepository.findByCpf(cpf);
     }
+
+    public void trocarSenha(Long id, String senhaAtual, String novaSenha, String confirmacao) {
+
+
+        if (senhaAtual == null || senhaAtual.isBlank()) {
+            throw new IllegalArgumentException("Informe a senha atual.");
+        }
+        if (novaSenha == null || novaSenha.isBlank()) {
+            throw new IllegalArgumentException("Informe a nova senha.");
+        }
+        if (confirmacao != null && !novaSenha.equals(confirmacao)) {
+            throw new IllegalArgumentException("As senhas não coincidem.");
+        }
+        if (novaSenha.length() < 8) {
+            throw new IllegalArgumentException("A nova senha deve possuir ao menos 8 caracteres.");
+        }
+
+        var usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado."));
+
+        if (!passwordEncoder.matches(senhaAtual, usuario.getSenha())) {
+            throw new SecurityException("Senha atual incorreta.");
+        }
+
+        usuario.setSenha(passwordEncoder.encode(novaSenha));
+        usuarioRepository.save(usuario);
+    }
 }
