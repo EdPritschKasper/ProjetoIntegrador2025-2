@@ -114,4 +114,11 @@ public class UsuarioController {
         var result = usuarioService.funcionarioMaisPedidos();
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
+
+    @GetMapping("/findByUsername")
+    public ResponseEntity<UsuarioEntity> findByUsername(@RequestParam String username) {
+        return usuarioService.findByUsername(username)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
 }
