@@ -1,7 +1,6 @@
 package com.Restaurante.Dove.controller;
 
 import com.Restaurante.Dove.model.UsuarioEntity;
-import com.Restaurante.Dove.repository.UsuarioRepository;
 import com.Restaurante.Dove.service.UsuarioService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -13,13 +12,12 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/usuarios")
+@RequestMapping("/api/usuario")
 @RequiredArgsConstructor
 @CrossOrigin("*")
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
-    private final UsuarioRepository repo;
 
     @GetMapping
     public ResponseEntity<List<UsuarioEntity>> findAll() {

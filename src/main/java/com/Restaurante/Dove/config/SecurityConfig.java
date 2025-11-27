@@ -34,9 +34,10 @@ public class SecurityConfig  {
 		.cors(AbstractHttpConfigurer::disable)
 		.authorizeHttpRequests((requests) -> requests
 				.requestMatchers("/api/login").permitAll()
-				.requestMatchers("/api/usuarios").permitAll()
-                        .requestMatchers("/api/usuarios/findByUsername").permitAll()
-                        .requestMatchers("/api/usuarios/findByEmail").permitAll()
+				.requestMatchers("/api/usuario").permitAll()
+                        .requestMatchers("/api/usuario/findByUsername").permitAll()
+                        .requestMatchers("/api/usuario/findByEmail").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/usuario/senha/**").permitAll()
                         .anyRequest()
                 .authenticated()
                     //    .permitAll()
