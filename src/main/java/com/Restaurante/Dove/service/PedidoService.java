@@ -21,8 +21,7 @@ public class PedidoService {
 
     private final PedidoRepository pedidoRepository;
     private final CardapioRepository cardapioRepository;
-    private final FuncionarioRepository funcionarioRepository;
-    private final ClienteRepository clienteRepository;
+    private final UsuarioRepository usuarioRepository;
     private final IngredienteRepository ingredienteRepository;
 
     public PedidoEntity save(PedidoEntity pedido) {
@@ -35,18 +34,11 @@ public class PedidoService {
             throw new RuntimeException("Nenhum cardápio informado para o pedido");
         }
 
-        // Buscar funcionário
-        if (pedido.getFuncionario() != null && pedido.getFuncionario().getId() != null) {
-            var funcionario = funcionarioRepository.findById(pedido.getFuncionario().getId())
-                    .orElseThrow(() -> new RuntimeException("Funcionário não encontrado"));
-            pedido.setFuncionario(funcionario);
-        }
-
-        // Buscar cliente
-        if (pedido.getCliente() != null && pedido.getCliente().getId() != null) {
-            var cliente = clienteRepository.findById(pedido.getCliente().getId())
-                    .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
-            pedido.setCliente(cliente);
+        // Buscar usuário (cliente ou funcionário)
+        if (pedido.getUsuario() != null && pedido.getUsuario().getId() != null) {
+            var usuario = usuarioRepository.findById(pedido.getUsuario().getId())
+                    .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+            pedido.setUsuario(usuario);
         }
 
         // Buscar ingredientes
@@ -89,16 +81,10 @@ public class PedidoService {
                 throw new RuntimeException("Nenhum cardápio informado para o pedido");
             }
 
-            if (pedidoAtualizado.getFuncionario() != null && pedidoAtualizado.getFuncionario().getId() != null) {
-                var funcionario = funcionarioRepository.findById(pedidoAtualizado.getFuncionario().getId())
-                        .orElseThrow(() -> new RuntimeException("Funcionario não encontrado"));
-                pedidoExistente.setFuncionario(funcionario);
-            }
-
-            if (pedidoAtualizado.getCliente() != null && pedidoAtualizado.getCliente().getId() != null) {
-                var cliente = clienteRepository.findById(pedidoAtualizado.getCliente().getId())
-                        .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
-                pedidoExistente.setCliente(cliente);
+            if (pedidoAtualizado.getUsuario() != null && pedidoAtualizado.getUsuario().getId() != null) {
+                var usuario = usuarioRepository.findById(pedidoAtualizado.getUsuario().getId())
+                        .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                pedidoExistente.setUsuario(usuario);
             }
 
             // Atualiza lista de ingredientes

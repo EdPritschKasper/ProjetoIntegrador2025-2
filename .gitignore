@@ -28,9 +28,9 @@ target/
 build/
 !**/src/main/**/build/
 !**/src/test/**/build/
-
 ### VS Code ###
 .vscode/
 
 src/java/com.Restaurante.Dove/resources/
 src/main/resources/application.properties
+.env
