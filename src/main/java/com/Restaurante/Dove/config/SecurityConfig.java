@@ -33,6 +33,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/usuario/findByUsername").permitAll()
                         .requestMatchers("/api/usuario/findByEmail").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/api/usuario/senha/**").permitAll()
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> 
@@ -60,7 +61,7 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
         config.setAllowedOriginPatterns(Arrays.asList("*"));
-        config.setAllowedHeaders(Arrays.asList(HttpHeaders.AUTHORIZATION, HttpHeaders.CONTENT_TYPE, HttpHeaders.ACCEPT));
+        config.setAllowedHeaders(Arrays.asList("*"));
         config.setAllowedMethods(Arrays.asList(HttpMethod.GET.name(), HttpMethod.POST.name(), HttpMethod.PUT.name(), HttpMethod.DELETE.name(), HttpMethod.OPTIONS.name()));
         config.setMaxAge(3600L);
         source.registerCorsConfiguration("/**", config);

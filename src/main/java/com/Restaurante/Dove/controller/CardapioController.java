@@ -15,7 +15,6 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/cardapios")
 @RequiredArgsConstructor
-@CrossOrigin("*")
 public class CardapioController {
 
     private final CardapioService cardapioService;
